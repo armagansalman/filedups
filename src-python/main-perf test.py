@@ -47,6 +47,14 @@ Cold-start:
 
 import time
 
+from typing import Set
+from typing import Sequence
+from typing import AnyStr
+from typing import Dict
+from typing import Iterable as Iter
+
+from collections.abc import Iterable
+
 import util as UT
 from classes import *
 
@@ -94,7 +102,7 @@ xMB = 1024 * xKB
 
 HASH_BYTES = 1 * xKB
 
-tmp_dict = dict()
+tmp_dict: Dict[str, Set] = dict()
 
 for i in range(3):
 	# "/media/public/SAMSUNG/NOT SAMSUNG/Any backup before 2020-02-16/" # 224365 files ; 618.96 secs
@@ -140,13 +148,13 @@ for i in range(3):
 	#
 
 	for key in tmp_dict.keys():
-		paths = tmp_dict[key]
+		st = tmp_dict[key]
 		if len(paths) < 2:
 			continue
 		#
 		
 		print(">>>>>>>", key[:32], "...")
-		for val in paths:
+		for val in st:
 			print(val)
 		#
 		print("################")

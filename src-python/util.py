@@ -59,20 +59,27 @@ def get_file_size_in_bytes(path):
     return statinfo.st_size
 #
 
-def get_local_file_size(PATH):
+def get_local_file_size(PATH: str) -> int:
 	return get_file_size_in_bytes(PATH)
 #
 
-def local_file_reader(file_path, size_to_read):
-    data = None
+def local_file_reader(file_path: str, start_offset: int, end_offset: int) -> bytes:
+	# Includes bytes at start_offset and end_offset
+	data = None
     
-    TODO: fseek
-    
-    with open(file_path, "rb") as in_fobj:
-        data = in_fobj.read(size_to_read)
+    #TODO(armagan): Read by chunks.
+	with open(file_path, "rb") as in_fobj:
+		in_fobj.seek(start_offset)
+		data = in_fobj.read(end_offset - start_offset + 1)
     #
     
-    return data
+	return data
+#
+
+def sha512_bytes(data: bytes):
+	hs = hashlib.sha512()
+	hs.update(data)
+	return hs.hexdigest()
 #
 
 def file_sha512(file_path, size_to_read):

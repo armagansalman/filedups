@@ -77,14 +77,40 @@ Design/Decisions/Definitions:
 		A FileGroup is an iterable of file indices (from FileIndexer).
 		'group_files' function returns an iterable of FileGroup elements. 
 		
-		+ TODO(armagan): optional byte count constraint?
-		+ TODO(armagan): Make 'DuplicateFinder' just a function interface.
+		+ TODO(armagan): ???optional byte count constraint.
+		+ TODO(armagan): ???Make 'DuplicateFinder' just a function interface.
 """
 
 
+# Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
+from typing import Iterable as Iterable_t
+from typing import Callable
+from typing import Any
+from typing import Sequence
+from typing import Set
+from typing import Tuple
+from typing import List
+from typing import TypeVar
+
+
+T_FXR = FileIndexer
+T_CALL = Callable
+T_iter = Iterable_t
+
+T_DupLocs = Set[int] # A group of duplicate files is a set of thier indices.
+T_DupGroups = T_iter[T_DupLocs]
+
+T_grouper = Callable[[T_FXR, T_iter[int], float], T_iter[int]]
+
+
 class FilesInfo:
-	def __init__(self, locations, reader_func, size_getter):
-		self.locations = locations
+	def __init__(self, locations: Iterable_t[Any] \
+	, reader_func: Callable[[Any, int, int], bytes] \
+	, size_getter: Callable[[Any], int]):
+	#	
+		self.locations: List[Any]  = list(locations)
+		# Ensure it's subscriptable.
+		
 		self.reader_func = reader_func
 		self.size_getter = size_getter
 	#
@@ -92,11 +118,11 @@ class FilesInfo:
 
 
 class FileIndexer:
-	def __init__(self, files_info_iter):
-		self.data = []
+	def __init__(self, files_info_iter: Iterable_t[FilesInfo]):
+		self.data: Sequence[FilesInfo] = []
 		# self.g_ref holds (x,y) ; x = file_info idx, y = location idx 
 		# in that  file_info.locations
-		self.g_ref = []
+		self.g_ref: Sequence[Tuple[int,int]] = []
 		
 		for idx, files_info in enumerate(files_info_iter):
 			self.data.append(files_info)
@@ -106,35 +132,48 @@ class FileIndexer:
 		#
 	#
 	
-	def get_location(self, idx):
+	def get_location(self, idx: int) -> Any:
 		(data_idx, loc_idx) = self.g_ref[idx]
-		locations = self.data[data_idx].locations
+		locations: Sequence[Any] = self.data[data_idx].locations
 		return locations[loc_idx]
 	#
 	
-	def get_reader(self, idx):
+	def get_reader(self, idx: int) -> Callable[[Any, int, int], bytes]:
 		data_pos = self.g_ref[idx]
 		return self.data[data_pos[0]].reader_func
 	#
 	
-	def get_size_func(self, idx):
+	def get_size_func(self, idx: int) -> Callable[[Any], int]:
 		data_pos = self.g_ref[idx]
 		return self.data[data_pos[0]].size_getter
 	#
 	
-	def get_idx_count(self):
+	def get_max_idx(self) -> int:
 		# Total number of locations minus 1.
 		return len(self.g_ref)
+	#
+	
+	def get_all_indices(self) -> Iterable_t[int]:
+		return [x for x in range(self.get_max_idx())]
+	#
+#
+
+
+
+def grouper_example(file_indexer, location_indices, match_percentage):
+	return 
 #
 
 
 class DuplicateFinder:
-	def __init__(self, file_indexer):
-		self.FIDX = file_indexer
+	def __init__(self \
+	#X = TypeVar(Callable[[FileIndexer, Iter_t[int], float], Tuple(FileIndexer,Iter_t[int])])
+	, groupers: Sequence[Tuple[T_FXR, float]]):
+		self.GRP = groupers
 	#
 	
 	def get_file_indexer(self):
-		return self.FIDX
+		return self.GRP
 	#
 	
 	def group_files(self, similarity_percentage):
@@ -143,8 +182,6 @@ class DuplicateFinder:
 			reader = self.FIDX.get_reader(lref)
 			size_func = self.FIDX.get_size_func(lref)
 			#
-			
-			
 #
 
 """
