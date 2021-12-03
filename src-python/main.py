@@ -17,7 +17,6 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 """
 
 
@@ -61,15 +60,8 @@ Cold-start:
 import time
 
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
-from typing import Tuple
-from typing import Set
-from typing import Sequence
-from typing import AnyStr
-from typing import Dict
-from typing import Iterable as Iter_t
 
-from collections.abc import Iterable
-
+import types
 import util as UT
 from classes import *
 
