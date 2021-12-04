@@ -84,20 +84,21 @@ Design/Decisions/Definitions:
 
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
 
+from user_types import *
 
 
 T_FXR = FileIndexer
 T_CALL = Callable
-T_iter = Iterable_t
+T_iter = Iter_t
 
 T_DupLocs = Set[int] # A group of duplicate files is a set of thier indices.
 T_DupGroups = T_iter[T_DupLocs]
 
-T_grouper = Callable[[T_FXR, T_iter[int], float], T_iter[int]]
+T_grouper = Callable[[T_FXR, Iter_t[int], float], Iter_t[int]]
 
 
 class FilesInfo:
-	def __init__(self, locations: Iterable_t[Any] \
+	def __init__(self, locations: Iter_t[Any] \
 	, reader_func: Callable[[Any, int, int], bytes] \
 	, size_getter: Callable[[Any], int]):
 	#	
@@ -111,7 +112,7 @@ class FilesInfo:
 
 
 class FileIndexer:
-	def __init__(self, files_info_iter: Iterable_t[FilesInfo]):
+	def __init__(self, files_info_iter: Iter_t[FilesInfo]):
 		self.data: Sequence[FilesInfo] = []
 		# self.g_ref holds (x,y) ; x = file_info idx, y = location idx 
 		# in that  file_info.locations
@@ -146,7 +147,7 @@ class FileIndexer:
 		return len(self.g_ref)
 	#
 	
-	def get_all_indices(self) -> Iterable_t[int]:
+	def get_all_indices(self) -> Iter_t[int]:
 		return [x for x in range(self.get_max_idx())]
 	#
 #

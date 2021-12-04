@@ -20,21 +20,7 @@
 """
 
 
-from typing import Callable
-# Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
-
-from typing import Any
-from typing import Sequence
-from typing import Set
-from typing import Tuple
-from typing import List
-from typing import TypeVar
-
-from typing import Tuple
-from typing import Set
-from typing import Sequence
-from typing import AnyStr
-from typing import Dict
-from typing import Iterable as Iter_t
-
-Iterable_t = Iter_t
+xB: int = 1
+xKB: int = 1024 * xB
+xMB: int = 1024 * xKB
+xGB: int = 1024 * xMB

@@ -60,10 +60,11 @@ Cold-start:
 import time
 
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
-
-import types
-import util as UT
+from user_types import *
+from constants import *
 from classes import *
+import util as UT
+
 
 
 #pic_path = "/home/public"
@@ -101,11 +102,6 @@ for i in range(FIDX.get_idx_count()):
 	print((location, fsize, fbytes))
 #
 """
-
-
-xB: int = 1
-xKB: int = 1024 * xB
-xMB: int = 1024 * xKB
 
 
 tmp_dict: Dict[str, Set] = dict() # Set makes every location unique.
@@ -181,7 +177,7 @@ def main_3():
 
 
 	def sha512_all_FIDX_locs(FX: FileIndexer):
-		indices: Iterable_t[int] = FX.get_all_indices()
+		indices: Iter_t[int] = FX.get_all_indices()
 		groups: Dict[str, Set[str]] = dict()
 		
 		for ix in indices:
@@ -268,7 +264,7 @@ def main_2():
 
 
 	def sha512_all_FIDX_locs(FX: FileIndexer):
-		indices: Iterable_t[int] = FX.get_all_indices()
+		indices: Iter_t[int] = FX.get_all_indices()
 		groups: Dict[str, Set[str]] = dict()
 		
 		for ix in indices:
