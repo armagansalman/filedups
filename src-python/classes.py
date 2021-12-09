@@ -84,17 +84,17 @@ Design/Decisions/Definitions:
 
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
 
-from user_types import *
+from common_types import *
 
 
-T_FXR = FileIndexer
-T_CALL = Callable
-T_iter = Iter_t
+#T_FXR = FileIndexer
+#T_CALL = Callable
+#T_iter = Iter_t
 
-T_DupLocs = Set[int] # A group of duplicate files is a set of thier indices.
-T_DupGroups = T_iter[T_DupLocs]
+#T_DupLocs = Set[int] # A group of duplicate files is a set of thier indices.
+#T_DupGroups = T_iter[T_DupLocs]
 
-T_grouper = Callable[[T_FXR, Iter_t[int], float], Iter_t[int]]
+#T_grouper = Callable[[T_FXR, Iter_t[int], float], Iter_t[int]]
 
 
 class FilesInfo:
@@ -102,7 +102,8 @@ class FilesInfo:
 	, reader_func: Callable[[Any, int, int], bytes] \
 	, size_getter: Callable[[Any], int]):
 	#	
-		self.locations: List[Any]  = list(locations)
+		self.locations: List[Any]  = list(set(locations))
+        # set to remove duplicate locations.
 		# Ensure it's subscriptable.
 		
 		self.reader_func = reader_func
@@ -147,7 +148,7 @@ class FileIndexer:
 		return len(self.g_ref)
 	#
 	
-	def get_all_indices(self) -> Iter_t[int]:
+	def get_all_indices(self) -> List[int]:
 		return [x for x in range(self.get_max_idx())]
 	#
 #
@@ -162,7 +163,7 @@ def grouper_example(file_indexer, location_indices, match_percentage):
 class DuplicateFinder:
 	def __init__(self \
 	#X = TypeVar(Callable[[FileIndexer, Iter_t[int], float], Tuple(FileIndexer,Iter_t[int])])
-	, groupers: Sequence[Tuple[T_FXR, float]]):
+	, groupers: Sequence[Tuple[FileIndexer, float]]):
 		self.GRP = groupers
 	#
 	

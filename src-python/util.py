@@ -23,10 +23,13 @@
 
 import os
 import hashlib
+import io
+
+from common_types import *
 
 
 def get_fpaths_recursively_from_folder(PATH):
-    rec_files = set()
+    rec_files: Set = set()
     # TODO(armaganslmn): ??? Error handling.
     if os.path.isfile(PATH):
         rec_files.add(PATH)
@@ -44,11 +47,11 @@ def get_fpaths_recursively_from_folder(PATH):
 
 
 def get_fpaths_from_path_iter(paths_iter):
-    file_paths = []
+    file_paths: Set = set()
     # TODO(armaganslmn): Handle if input is file.
     # TODO(armaganslmn): ??? Error handling.
     for path in paths_iter:
-        file_paths.extend( get_fpaths_recursively_from_folder(path) )
+        file_paths = file_paths.union( get_fpaths_recursively_from_folder(path) )
     #
     return file_paths
 #
@@ -108,3 +111,43 @@ def getSHA256(currentFile, full=False):
 			buf = file.read(BLOCKSIZE)
 	return hasher.hexdigest()
 """
+
+
+
+"""
+with io.open(filename,'r',encoding='utf8') as f:
+    text = f.read()
+# process Unicode text
+with io.open(filename,'w',encoding='utf8') as f:
+    f.write(text)
+"""
+def write_file_utf8(fpath: str, text: str, OPEN_MODE: str):
+
+    with io.open(fpath, OPEN_MODE, encoding='utf8') as F:
+        F.write(text)
+    #
+#
+
+
+def append_file_list_utf8(fpath: str, data: List):
+    print("[ INFO ] Appended to file:", fpath)
+    write_file_utf8(fpath, ''.join(data), 'a')
+#
+
+
+def append_file_text_utf8(fpath: str, text: str):
+    print("[ INFO ] Appended to file:", fpath)
+    write_file_utf8(fpath, text, 'a')
+#
+
+
+def write_file_text_utf8(fpath: str, text: str, FORCE_OVERWRITE = False):
+    # Write text to file.
+    if os.path.exists(fpath) and FORCE_OVERWRITE == True:
+        write_file_utf8(fpath, text, 'w')
+        print("[ INFO ] Written (mode = w) to file:", fpath)
+    #
+    else:
+        print("[ WARNING ] NO text was written to file: '", fpath, "' FORCE_OVERWRITE = ", FORCE_OVERWRITE)
+    #
+#

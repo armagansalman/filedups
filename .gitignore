@@ -1,4 +1,6 @@
 *.txt
+*.bak
+*.7z
 __pycache__/
 local/
 
