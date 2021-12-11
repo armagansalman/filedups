@@ -145,7 +145,9 @@ GIVEN_PATHS: List[str] = \
 "/home/public" \
 ]
 
-HASH_BYTES: int = 1024 * CONST.xB
+HASH_BYTES: int = 2 * CONST.xKB
+
+smallest_file_size = 10 * CONST.xMB
 
 def get_nonzero_length_files(paths_arg: Iter_t[str]):
     unq_paths_arg = set(paths_arg)
@@ -367,13 +369,22 @@ def main_2():
 #
 
 
-def main_3():
+def main_3(fpath):
     # For local files.
     # TODO(armagan): Rewrite all.
     string_seq: List = []
     #, "D:\\"
     #GIVEN_PATHS_3 = ["D:\Documents\Aile", "D:\Documents", "D:\Documents\Game Related", "D:\\"]
-    GIVEN_PATHS_3 = ["H:/NOT SAMSUNG/Aile family"]
+    #GIVEN_PATHS_3 = ["H:/NOT SAMSUNG/Aile family"]
+    GIVEN_PATHS_3 = ["D:\ALL BOOKS-PAPERS"]
+    
+    string_seq.extend( ["======= filedups-main-3 function begining ======= "] )
+    string_seq.append('\n')
+    
+    now_str = UT.get_now_str()
+    
+    string_seq.extend( ["Start datetime UTC = {}".format(now_str)] )
+    string_seq.append('\n')
     
     string_seq.extend( GIVEN_PATHS_3 )
     string_seq.append('\n')
@@ -394,12 +405,15 @@ def main_3():
 
     FINDX = FileIndexer([fsinfo])
 
+    
 
     def sha512_all_FIDX_locs(FX: FileIndexer):
-        Group_Val_t = Set[Tuple[int, Any]] # int = len ; Any = location
+        Group_Val_t = Set[Tuple[int, Any]] # int = len in bytes ; Any = location
         
         indices: List[int] = FX.get_all_indices()
         groups: Dict[str, Group_Val_t] = dict()
+        
+        
         
         for ix in indices:
             loc = FX.get_location(ix)
@@ -450,10 +464,15 @@ def main_3():
             string_seq.extend( [">>>>>>>", key[:32], "..."] )
             string_seq.append('\n')
             
+            
+            
             for val in paths:
                 #print(val)
-                string_seq.extend( [val] )
-                string_seq.append('\n')
+                sz, loc = val
+                if sz >= smallest_file_size:                
+                    string_seq.extend( [val] )
+                    string_seq.append('\n')
+                #
             #
             #print("################")
             
@@ -491,7 +510,7 @@ def main_3():
     string_seq.extend( ["**********************************************************************"] )
     string_seq.append('\n')
     
-    fpath = "2021-12-09_filedups-main-3_1.txt"
+    
     
     stringified = map(str, string_seq)
     
@@ -499,6 +518,9 @@ def main_3():
     
     #
 #
+
+now_str = UT.get_now_str()
+g_fpath = "{}_({}).txt".format(now_str, smallest_file_size)
 for i in range(3):
     """
     seq = ["abc", "def", "gh", "\n"]
@@ -512,7 +534,7 @@ for i in range(3):
     exit(0)
     """
     
-    main_1()
-    #main_3()
+    #main_1()
+    main_3(g_fpath)
 #
 

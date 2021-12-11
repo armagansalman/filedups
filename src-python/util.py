@@ -24,8 +24,22 @@
 import os
 import hashlib
 import io
+import datetime
 
 from common_types import *
+
+
+def get_utc_datetime_now():
+    return datetime.datetime.now()
+#
+
+
+def get_now_str():
+    now = get_utc_datetime_now()
+    now_str = "{}-{}-{}-{}-{}-{}".format(now.year, now.month, now.day, now.hour \
+    , now.minute, now.second)
+    return now_str
+#
 
 
 def get_fpaths_recursively_from_folder(PATH):
