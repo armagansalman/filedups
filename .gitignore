@@ -3,6 +3,7 @@
 *.7z
 __pycache__/
 local/
+*.mypy*
 
 
 # These are some examples of commonly ignored file patterns.

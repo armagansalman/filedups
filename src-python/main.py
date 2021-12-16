@@ -145,9 +145,7 @@ GIVEN_PATHS: List[str] = \
 "/home/public" \
 ]
 
-HASH_BYTES: int = 2 * CONST.xKB
 
-smallest_file_size = 10 * CONST.xMB
 
 def get_nonzero_length_files(paths_arg: Iter_t[str]):
     unq_paths_arg = set(paths_arg)
@@ -369,14 +367,14 @@ def main_2():
 #
 
 
-def main_3(fpath):
+def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
     # For local files.
     # TODO(armagan): Rewrite all.
     string_seq: List = []
     #, "D:\\"
     #GIVEN_PATHS_3 = ["D:\Documents\Aile", "D:\Documents", "D:\Documents\Game Related", "D:\\"]
     #GIVEN_PATHS_3 = ["H:/NOT SAMSUNG/Aile family"]
-    GIVEN_PATHS_3 = ["D:\ALL BOOKS-PAPERS"]
+    GIVEN_PATHS_3 = IN_PATHS
     
     string_seq.extend( ["======= filedups-main-3 function begining ======= "] )
     string_seq.append('\n')
@@ -396,10 +394,12 @@ def main_3(fpath):
     
     #print("HASH_BYTES=", HASH_BYTES)
 
-    string_seq.extend( ["HASH_BYTES=", HASH_BYTES] )
+    string_seq.extend( ["HASH_SIZE=", HASH_SIZE] )
     string_seq.append('\n')
 
     fls: Set[str] = get_nonzero_length_files(GIVEN_PATHS_3)
+    
+    
 
     fsinfo = FilesInfo(fls, UT.local_file_reader, UT.get_local_file_size)
 
@@ -422,7 +422,7 @@ def main_3(fpath):
             
             # 0.09671903399976145 sec = get all 3 data for all 3338 files.
             try:
-                fdata: bytes = reader(loc, 0, HASH_BYTES-1)
+                fdata: bytes = reader(loc, 0, HASH_SIZE-1)
                 # 0.1660889649992896
                 
                 
@@ -469,7 +469,7 @@ def main_3(fpath):
             for val in paths:
                 #print(val)
                 sz, loc = val
-                if sz >= smallest_file_size:                
+                if sz >= SMALLEST_FSIZE:                
                     string_seq.extend( [val] )
                     string_seq.append('\n')
                 #
@@ -514,13 +514,13 @@ def main_3(fpath):
     
     stringified = map(str, string_seq)
     
-    UT.append_file_text_utf8(fpath, ' '.join(stringified))
+    UT.append_file_text_utf8(out_fpath, ' '.join(stringified))
     
     #
 #
 
 now_str = UT.get_now_str()
-g_fpath = "{}_({}).txt".format(now_str, smallest_file_size)
+
 for i in range(3):
     """
     seq = ["abc", "def", "gh", "\n"]
@@ -535,6 +535,22 @@ for i in range(3):
     """
     
     #main_1()
-    main_3(g_fpath)
+    smallest_file_size = 1 * CONST.xKB
+    
+    OUTFILE_PATH = "{}_bigger than ({} kB).txt".format(now_str, smallest_file_size // 1024)
+    
+    HASH_BYTES: int = 2 * CONST.xKB
+
+    
+    
+    #search_paths_WINDOWS = ["D:\ALL BOOKS-PAPERS", "D:\Documents", "D:\HxD", "D:\Program Files"]
+    
+    #main_3(OUTFILE_PATH, search_paths_WINDOWS, HASH_BYTES, smallest_file_size)
+    
+    search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
+    , "/media/genel/Bare-Data/Documents/" \
+    , "/media/genel/Bare-Data/HxD/" \
+    , "/media/genel/Bare-Data/Program Files/"]
+    main_3(OUTFILE_PATH, search_paths_MINT, HASH_BYTES, smallest_file_size)
 #
 
