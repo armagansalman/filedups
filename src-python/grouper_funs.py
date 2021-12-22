@@ -20,24 +20,33 @@
 """
 
 
-from typing import Callable
-# Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
-
-from typing import Iterable as Iter_t
-from typing import Sequence
-
-from typing import Any
-from typing import AnyStr
-from typing import Dict
-from typing import Set
-from typing import List
-from typing import Tuple
-from typing import Sized
-
-from typing import TypeVar
-
-LocationIndices_t = Iter_t[int]
-LocationGroups_t = Iter_t[LocationIndices_t]
+from common_types import *
+from classes import *
 
 
-# Iterable_t = Iter_t
+def grouper_example(file_indexer, location_indices, match_percentage):
+    return
+#
+
+
+def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t, \
+                    PERC: MatchPercentage_t) -> LocationGroups_t:
+    
+    size_groups: Dict[int, Set[int]] = dict()
+    for IDX in LOCS:
+        LOC = FIDX.get_location(IDX)
+        SFUN = FIDX.get_size_func(IDX)
+        SIZE = SFUN(LOC)
+        
+        group: Set[int] = size_groups.get(SIZE, set())
+        group.add(IDX)
+        size_groups[SIZE] = group
+    #
+    res: List[Set[int]] = list()
+    for key, val in size_groups.items():
+        res.append(val)
+    #
+    return res
+#
+
+

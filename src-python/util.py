@@ -36,35 +36,42 @@ def get_utc_datetime_now():
 
 def get_now_str():
     now = get_utc_datetime_now()
-    now_str = "{}-{}-{}-{}-{}-{}".format(now.year, now.month, now.day, now.hour \
+    now_str = "{}-{}-{}_{}-{}-{}".format(now.year, now.month, now.day, now.hour \
     , now.minute, now.second)
     return now_str
 #
 
 
-def get_fpaths_recursively_from_folder(PATH):
+def get_fpaths_recursively_from_folder(PATH: str):
     rec_files: Set = set()
     # TODO(armaganslmn): ??? Error handling.
+    
     if os.path.isfile(PATH):
         rec_files.add(PATH)
         return rec_files
     #
     
-    for root, dirs, files in os.walk(PATH):
-        for name in files:
-            p = os.path.join(root, name)
-            rec_files.add(os.path.abspath(p))
+    elif os.path.isdir(PATH):
+        for root, dirs, files in os.walk(PATH):
+            for name in files:
+                p = os.path.join(root, name)
+                rec_files.add(os.path.abspath(p))
+            #
         #
+    
+    else: # Link or something else. Ignore them.
+        pass
     #
     return rec_files
 #
 
 
-def get_fpaths_from_path_iter(paths_iter):
+def get_fpaths_from_path_iter(paths_iter: List[str]):
     file_paths: Set = set()
+    unq_paths = set(paths_iter)
     # TODO(armaganslmn): Handle if input is file.
     # TODO(armaganslmn): ??? Error handling.
-    for path in paths_iter:
+    for path in unq_paths:
         file_paths = file_paths.union( get_fpaths_recursively_from_folder(path) )
     #
     return file_paths

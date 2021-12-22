@@ -20,7 +20,7 @@
 """
 
 
-xB: int = 1
-xKB: int = 1024 * xB
+xBYTE: int = 1
+xKB: int = 1024 * xBYTE
 xMB: int = 1024 * xKB
 xGB: int = 1024 * xMB

@@ -147,12 +147,11 @@ GIVEN_PATHS: List[str] = \
 
 
 
-def get_nonzero_length_files(paths_arg: Iter_t[str]):
-    unq_paths_arg = set(paths_arg)
+def get_nonzero_length_files(paths_arg: List[str]):
     paths: Set = set()
     # Set makes every location unique.
     
-    for p in UT.get_fpaths_from_path_iter(unq_paths_arg):
+    for p in UT.get_fpaths_from_path_iter(paths_arg):
         try:
             sz = UT.get_file_size_in_bytes(p)
             if sz > 0:
@@ -394,11 +393,17 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
     
     #print("HASH_BYTES=", HASH_BYTES)
 
-    string_seq.extend( ["HASH_SIZE=", HASH_SIZE] )
+    string_seq.extend( ["HASH_SIZE(bytes)=", HASH_SIZE] )
+    string_seq.append('\n')
+    
+    string_seq.extend( ["SMALLEST_FSIZE(bytes)=", SMALLEST_FSIZE] )
     string_seq.append('\n')
 
     fls: Set[str] = get_nonzero_length_files(GIVEN_PATHS_3)
     
+    
+    string_seq.extend( ["Total number of files to search=", len(fls)] )
+    string_seq.append('\n')
     
 
     fsinfo = FilesInfo(fls, UT.local_file_reader, UT.get_local_file_size)
@@ -413,7 +418,7 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
         indices: List[int] = FX.get_all_indices()
         groups: Dict[str, Group_Val_t] = dict()
         
-        
+        file_report_counter = 0
         
         for ix in indices:
             loc = FX.get_location(ix)
@@ -422,6 +427,12 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
             
             # 0.09671903399976145 sec = get all 3 data for all 3338 files.
             try:
+                fsize: int = sizer(loc)
+                
+                if fsize < SMALLEST_FSIZE:
+                    continue
+                #
+                
                 fdata: bytes = reader(loc, 0, HASH_SIZE-1)
                 # 0.1660889649992896
                 
@@ -431,7 +442,7 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
                 # 0.18996872500065365
                 # 0.2524847469994711
                 
-                fsize: int = sizer(loc)
+                
                 
                 size_loc = (fsize, loc)
                 
@@ -472,6 +483,8 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
                 if sz >= SMALLEST_FSIZE:                
                     string_seq.extend( [val] )
                     string_seq.append('\n')
+                    
+                    file_report_counter += 1
                 #
             #
             #print("################")
@@ -481,14 +494,19 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
             
         #
         
+        string_seq.extend( ["Reported file count=", file_report_counter] )
+        string_seq.append('\n')
+        
         return len(indices)
     #
 
 
     #print("Processed file count:", sha512_all_FIDX_locs(FINDX))
 
-    string_seq.extend( ["Processed file count:", sha512_all_FIDX_locs(FINDX)] )
-    string_seq.append('\n')
+    #string_seq.extend( ["Processed file count:", sha512_all_FIDX_locs(FINDX)] )
+    #string_seq.append('\n')
+
+    sha512_all_FIDX_locs(FINDX)
 
     TM_end = time.perf_counter()
 
@@ -519,7 +537,7 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
     #
 #
 
-now_str = UT.get_now_str()
+NOW = UT.get_now_str()
 
 for i in range(3):
     """
@@ -535,11 +553,11 @@ for i in range(3):
     """
     
     #main_1()
-    smallest_file_size = 1 * CONST.xKB
+    smallest_file_size = 1 * CONST.xBYTE
     
-    OUTFILE_PATH = "{}_bigger than ({} kB).txt".format(now_str, smallest_file_size // 1024)
+    OUTFILE_PATH = "{}_bigger than ({} kB).txt".format(NOW, smallest_file_size // 1024)
     
-    HASH_BYTES: int = 2 * CONST.xKB
+    HASH_BYTES: int = 1 * CONST.xKB
 
     
     
@@ -547,10 +565,16 @@ for i in range(3):
     
     #main_3(OUTFILE_PATH, search_paths_WINDOWS, HASH_BYTES, smallest_file_size)
     
+    
     search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
     , "/media/genel/Bare-Data/Documents/" \
     , "/media/genel/Bare-Data/HxD/" \
     , "/media/genel/Bare-Data/Program Files/"]
+    
+    
+    
+    
+    
     main_3(OUTFILE_PATH, search_paths_MINT, HASH_BYTES, smallest_file_size)
 #
 
