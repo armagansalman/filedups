@@ -19,7 +19,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+import util as UT
 from common_types import *
 from classes import *
 
@@ -38,6 +38,7 @@ def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t, \
         SFUN = FIDX.get_size_func(IDX)
         SIZE = SFUN(LOC)
         
+        # Group location indices which have the same size:
         group: Set[int] = size_groups.get(SIZE, set())
         group.add(IDX)
         size_groups[SIZE] = group
@@ -50,3 +51,31 @@ def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t, \
 #
 
 
+def sha512_first_X_bytes(X: int) -> GroupFunc_t:
+    #
+    def grouper(FIDX: FileIndexer, LOCS: LocationIndices_t, \
+                    PERC: MatchPercentage_t) -> LocationGroups_t:
+        #
+        hash_groups: Dict[int, Set[int]] = dict()
+        
+        for IDX in LOCS:
+            LOC = FIDX.get_location(IDX)
+            read_func = FIDX.get_reader(IDX)
+            FIRST_X_BYTES = read_func(LOC, 0, X-1) # end byte idx = X-1
+            
+            hex_hash = UT.sha512_bytes(FIRST_X_BYTES)
+            
+            group: Set[int] = hash_groups.get(hex_hash, set())
+            group.add(IDX)
+            hash_groups[hex_hash] = group
+        #
+        
+        res: List[Set[int]] = list()
+        for key, val in hash_groups.items():
+            res.append(val)
+        #
+        return res
+    #
+    return grouper
+#
+                        

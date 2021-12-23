@@ -42,6 +42,11 @@ def get_now_str():
 #
 
 
+def get_path_basename(PATH: str):
+    return os.path.basename(PATH)
+#
+
+
 def get_fpaths_recursively_from_folder(PATH: str):
     rec_files: Set = set()
     # TODO(armaganslmn): ??? Error handling.
@@ -67,6 +72,9 @@ def get_fpaths_recursively_from_folder(PATH: str):
 
 
 def get_fpaths_from_path_iter(paths_iter: List[str]):
+    if type(paths_iter) != list:
+        raise Exception("A list of str paths must be given.")
+    
     file_paths: Set = set()
     unq_paths = set(paths_iter)
     # TODO(armaganslmn): Handle if input is file.
@@ -87,17 +95,36 @@ def get_local_file_size(PATH: str) -> int:
 	return get_file_size_in_bytes(PATH)
 #
 
-def local_file_reader(file_path: str, start_offset: int, end_offset: int) -> bytes:
-	# Includes bytes at start_offset and end_offset
-	data = None
+def get_nonzero_length_files(paths_arg: List[str]):
+    paths: Set = set()
+    # Set makes every location unique.
     
-    #TODO(armagan): Read by chunks.
-	with open(file_path, "rb") as in_fobj:
-		in_fobj.seek(start_offset)
-		data = in_fobj.read(end_offset - start_offset + 1)
+    for p in get_fpaths_from_path_iter(paths_arg):
+        try:
+            sz = get_file_size_in_bytes(p)
+            if sz >= 1:
+                paths.add(p)
+        except:
+            pass
     #
     
-	return data
+    return paths
+#
+
+def local_file_reader(file_path: str, start_offset: int, end_offset: int) -> bytes:
+    # Includes bytes at start_offset and end_offset
+    try:
+        data = None
+        
+        #TODO(armagan): Read by chunks.
+        with open(file_path, "rb") as in_fobj:
+            in_fobj.seek(start_offset)
+            data = in_fobj.read(end_offset - start_offset + 1)
+        #
+        
+        return data
+    except: # TODO(armagan): Use Optional type to return bytes or None.
+        return None
 #
 
 def sha512_bytes(data: bytes):

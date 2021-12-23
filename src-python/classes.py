@@ -179,20 +179,62 @@ class DuplicateFinder:
         self.SIMILARITY = SIMILARITY_PERCENTAGE
     #
     
+    
     def get_file_indexer(self):
         return self.FIDX
     #
     
+    
     def apply_one_grouper(self, LOCS: LocationIndices_t, \
-                        FUNC: GroupFunc_t):
+                        FUNC: GroupFunc_t) -> LocationGroups_t:
+        #
         locs: LocationGroups_t = FUNC(self.FIDX, LOCS, \
                                             self.SIMILARITY)
         return locs
     #
     
-    def apply_multiple_groupers(self, grouper_fun_list):
+    
+    def rec_apply(self, LOCS: LocationIndices_t, FUNC_IDX, \
+                    GROUPERS: List[GroupFunc_t]) -> LocationGroups_t:
+        #
+        locs: Set[int] = set(LOCS)
+        if len(locs) < 2: # Fewer than 2 files can't be duplicates.
+            return [locs]
+        #
+        
+        if FUNC_IDX >= len(GROUPERS): # No grouper func. left to apply.
+            return [locs]
+        #
+        
+        loc_groups: LocationGroups_t = self.apply_one_grouper(locs,\
+                                                    GROUPERS[FUNC_IDX])
+        #
+        
+        
+        NEXT_FUNC_IDX = FUNC_IDX + 1
+        combined_groups: List[LocationIndices_t] = []
+        
+        for grp in loc_groups:
+            sub_grp_result: LocationGroups_t = self.rec_apply(grp, \
+                                                NEXT_FUNC_IDX, GROUPERS)
+            #
+            for sub_grp in sub_grp_result:
+                combined_groups.append(sub_grp)
+            #
+        #
+        
+        return combined_groups
+    #
+    
+    
+    def apply_multiple_groupers(self, LOCS: LocationIndices_t, \
+                    GROUPERS: List[GroupFunc_t]) -> LocationGroups_t:
         # TODO(armagan): ???User MUST ??? match percentage.
-        pass
+        GROUPER_FUNC_IDX = 0
+        result_groups: LocationGroups_t = self.rec_apply(LOCS, \
+                                            GROUPER_FUNC_IDX, GROUPERS)
+        #
+        return result_groups
     #
     
     """
@@ -205,62 +247,3 @@ class DuplicateFinder:
     """
 #
 
-"""
-
-finf_1 = FilesInfo(["abc", "bac", "cba"], reader_tmp, size_getter_tmp)
-finf_2 = FilesInfo(["dabc", "dbac", "dcba"], reader_tmp, size_getter_tmp)
-finf_3 = FilesInfo(["qdabc", "qdbac", "qdcba"], full_reader, size_getter_tmp)
-
-finfos = [finf_1, finf_2, finf_3]
-
-
-FIDX = FileIndexer(finfos)
-
-print(FIDX.get_idx_count())
-print(FIDX.get_location(8))
-print(FIDX.get_location(5))
-print(FIDX.get_location(0))
-
-for i in range(FIDX.get_idx_count()):
-    location = FIDX.get_location(i)
-    fsize = FIDX.get_size_func(i)(location)
-    fbytes = FIDX.get_reader(i)(location, 0, 2)
-    
-    print((location, fsize, fbytes))
-#
-
-"""
-
-
-
-
-
-
-
-
-"""
-
-def data_indexer(file_info_iter):
-    all_data = []
-    
-    for elm in file_info_iter:
-        all_data.append(elm)
-    #
-    
-    g_idx = 0
-    g_ref = []
-    for idx, files_info in enumerate(all_data):
-        for loc in files_info.locations:
-            g_ref.append(idx)
-    #
-    print(g_ref)
-    return(g_ref)
-#
-
-
-g_idx = data_indexer(finfos)
-
-print(g_idx[0])
-
-
-"""

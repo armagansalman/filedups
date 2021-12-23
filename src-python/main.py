@@ -20,37 +20,9 @@
 """
 
 
-"""
-no-hash_-_ELAPSED: 0.049525973008712754_-_3338 files
 
-1-B hash_-_ELAPSED: 0.1311204009980429_-_3338 files
-128-B hash_-_ELAPSED: 0.13475250000192318_-_3338 files
-256-B hash_-_ELAPSED: 0.13714175000495743_-_3338 files
-512-B hash_-_ELAPSED: 0.14457203799975105_-_3338 files
-
-1-KB hash_-_ELAPSED: 0.14528957300353795_-_3338 files
-2-KB hash_-_ELAPSED: 0.1580927140021231_-_3338 files
-4-KB hash_-_ELAPSED: 0.17637374300102238_-_3338 files
-
-
-main-2; 256-B hash_-_ELAPSED: 0.14755042799879448_-_3338 files
-[
-Double traversal:
-main-2; 256-B hash_-_ELAPSED: 0.19136745800278732_-_3338 files
-main-2; 1-KB hash_-_ELAPSED: 0.1997125239977322_-_3338 files
-main-2; 2-KB hash_-_ELAPSED: 0.21675798000069335_-_3338 files
-main-2; 4-KB hash_-_ELAPSED: 0.23161685800005216_-_3338 files
-]
-
-Cold-start:
-256-B_-_ELAPSED: 156.7744490999903_-_20729 files (home/public)
-4-KB_-_ELAPSED: 31.84445598500315_-_3338 files (pics/Aile family)
-
-
-"""
-
-
-# WARNING: Don't use print on Windows. Errors like "UnicodeEncodeError: 'charmap' codec can't encode character '\u015f'" can occur
+# WARNING: Don't use print on Windows. Errors like "UnicodeEncodeError: 
+# 'charmap' codec can't encode character '\u015f'" can occur
 
 # NOTE(armagan): 512 bytes seem reasonable for the first pass.
 # TODO(armagan): For printing paths, split filename, write filename first.
@@ -67,6 +39,7 @@ from common_types import *
 import constants as CONST
 from classes import *
 import util as UT
+import grouper_funs as GRPR
 
 
 
@@ -147,21 +120,7 @@ GIVEN_PATHS: List[str] = \
 
 
 
-def get_nonzero_length_files(paths_arg: List[str]):
-    paths: Set = set()
-    # Set makes every location unique.
-    
-    for p in UT.get_fpaths_from_path_iter(paths_arg):
-        try:
-            sz = UT.get_file_size_in_bytes(p)
-            if sz > 0:
-                paths.add(p)
-        except:
-            pass
-    #
-    
-    return paths
-#
+get_nonzero_length_files = UT.get_nonzero_length_files
 # aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 
@@ -380,7 +339,7 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
     
     now_str = UT.get_now_str()
     
-    string_seq.extend( ["Start datetime UTC = {}".format(now_str)] )
+    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
     string_seq.append('\n')
     
     string_seq.extend( GIVEN_PATHS_3 )
@@ -537,6 +496,142 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
     #
 #
 
+def main_4(out_fpath, IN_PATHS: List[str], HASH_SIZE, SMALLEST_FSIZE):
+    string_seq: List = []
+    
+    string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
+    string_seq.append('\n')
+    
+    now_str = UT.get_now_str()
+    
+    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
+    string_seq.append('\n')
+    
+    string_seq.append("Paths: ")
+    string_seq.extend( IN_PATHS )
+    string_seq.append('\n')
+    
+    TM_beg = time.perf_counter()
+    
+    #print("HASH_BYTES=", HASH_BYTES)
+
+    # string_seq.extend( ["HASH_SIZE(bytes)=", HASH_SIZE] )
+    # string_seq.append('\n')
+    
+    string_seq.extend( ["SMALLEST_FSIZE(bytes)=", SMALLEST_FSIZE] )
+    string_seq.append('\n')
+
+    
+    fls_unfiltered: Set[str] = UT.get_fpaths_from_path_iter(IN_PATHS)
+    
+    SMALLEST_SIZE: int = SMALLEST_FSIZE
+    
+    def flt_size(path: str):
+        #
+        try:
+            sz = UT.get_file_size_in_bytes(path)
+            if sz >= SMALLEST_SIZE:
+                return True
+            #
+            return False
+        #
+        except:
+            return False
+    #
+    
+    string_seq.extend( ["Using size filter. Size(bytes)=", SMALLEST_SIZE] )
+    string_seq.append('\n')
+    
+    locations: Set[str] = set(filter(flt_size, fls_unfiltered))
+    
+    # fls: Set[str] = UT.get_nonzero_length_files(IN_PATHS)
+    
+    string_seq.extend( ["Total number of files to search=", len(locations)] )
+    string_seq.append('\n')
+    
+
+    fsinfo = FilesInfo(locations, UT.local_file_reader, \
+                        UT.get_local_file_size)
+
+    FINDX = FileIndexer([fsinfo])
+    
+    # TODO(armagan): Use DuplicateFinder class and group function(s).
+    FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
+    all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
+    
+    
+    
+    grouper_funcs = [ GRPR.group_by_size \
+     , GRPR.sha512_first_X_bytes(X=512) \
+     , GRPR.sha512_first_X_bytes(X=2048) ]
+    
+    found_groups: LocationGroups_t = FINDER.apply_multiple_groupers(\
+                                    all_indices, grouper_funcs)
+    
+    
+    """
+    size_group: LocationGroups_t = FINDER.apply_one_grouper(all_indices,\
+                                                        GRPR.group_by_size)
+    #
+    """
+    
+    i = 0
+    for seq in found_groups:
+        if len(list(seq)) < 2:
+            continue # Skip unique files.
+        
+        string_seq.append("----------- [Group {}] start------".format(i))
+        string_seq.append('\n')
+        
+        for loc_idx in seq:
+            # TODO(armagan): This is an ugly way and code. Use PyConst or
+            # immutable data structures instead of class/objects.
+            # ??https://github.com/tobgu/pyrsistent
+            
+            loc = FINDER.get_file_indexer().get_location(loc_idx)
+            string_seq.extend( ["Full path:", loc])
+            string_seq.append('\n')
+            string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
+            string_seq.append('\n')
+        #
+        string_seq.append("*********** [Group {}] END *******".format(i))
+        string_seq.append('\n')
+        string_seq.append('\n')
+        
+        i += 1
+    #
+    """"""
+    TM_end = time.perf_counter()
+
+    #print("ELAPSED:",TM_end - TM_beg)
+    
+    string_seq.extend( ["End datetime ISO-8601 = {}".format(UT.get_now_str())] )
+    string_seq.append('\n')
+    
+    string_seq.extend( ["ELAPSED:",TM_end - TM_beg, "seconds."] )
+    string_seq.append('\n')
+    
+    indices: List[int] = FINDX.get_all_indices()
+    
+    #print(len(indices))
+    string_seq.extend( [len(indices)] )
+    string_seq.append('\n')
+    
+    #print(indices[:7])
+    #string_seq.extend([indices[:7]])
+    
+    #print("***************************************")
+    string_seq.extend( ["**********************************************************************"] )
+    string_seq.append('\n')
+    
+    
+    
+    stringified = map(str, string_seq)
+    
+    UT.append_file_text_utf8(out_fpath, ' '.join(stringified))
+#
+
+
 NOW = UT.get_now_str()
 
 for i in range(3):
@@ -553,11 +648,11 @@ for i in range(3):
     """
     
     #main_1()
-    smallest_file_size = 1 * CONST.xBYTE
+    smallest_file_size: int = 1 * CONST.xBYTE
     
-    OUTFILE_PATH = "{}_bigger than ({} kB).txt".format(NOW, smallest_file_size // 1024)
+    OUTFILE_PATH = "{}_bigger than ({} bytes).txt".format(NOW, smallest_file_size)
     
-    HASH_BYTES: int = 1 * CONST.xKB
+    HASH_BYTES: int = 1 * CONST.xKB # Unnecessary (2021-12-23).
 
     
     
@@ -572,9 +667,20 @@ for i in range(3):
     , "/media/genel/Bare-Data/Program Files/"]
     
     
+    _search_paths_MINT = ["/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
+    , "/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
+    , "/media/genel/SAMSUNG/NOT SAMS/Aile fotolar, videolar/" \
+    , "/media/genel/SAMSUNG/NOT SAMS/Aile family/"]
+    # search_paths_MINT = "/media/genel/SAMSUNG/NOT SAMS/Alltxt files/"
     
+    _search_paths_MINT = ["/media/genel/Bare-Data/"]
     
+    _search_paths_MINT = ["/home/genel/"]
     
-    main_3(OUTFILE_PATH, search_paths_MINT, HASH_BYTES, smallest_file_size)
+    _search_paths = ["/home/genel/"]
+    
+    search_paths = ["/media/genel/Bare-Data/"]
+    
+    main_4(OUTFILE_PATH, search_paths, HASH_BYTES, smallest_file_size)
 #
 

@@ -36,7 +36,7 @@ from typing import Sized
 
 from typing import TypeVar
 
-LocationIndices_t = Iter_t[int]
+LocationIndices_t = Set[int]
 LocationGroups_t = Iter_t[LocationIndices_t]
 
 
