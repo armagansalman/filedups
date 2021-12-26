@@ -98,13 +98,16 @@ from common_types import *
 
 StartIdx = int
 EndIdx = int
+Location = Any
+ReaderFunc = Callable[[Any, StartIdx, EndIdx], bytes]
+SizeFunc = Callable[[Any], int]
 
 class FilesInfo:
     def __init__(self, locations: Iter_t[Any] \
-    , reader_func: Callable[[Any, StartIdx, EndIdx], bytes] \
-    , size_getter: Callable[[Any], int]):
+    , reader_func: ReaderFunc \
+    , size_getter: SizeFunc):
     #   
-        self.locations: List[Any]  = list(set(locations))
+        self.locations: List[Location]  = list(set(locations))
         # set to remove duplicate locations.
         # Ensure it's subscriptable.
         
@@ -115,6 +118,7 @@ class FilesInfo:
 
 
 class FileIndexer:
+    """
     def __init__(self, files_info_iter: Iter_t[FilesInfo]):
         self.data: Sequence[FilesInfo] = []
         # self.g_ref holds (x,y) ; x = file_info idx, y = location idx 
@@ -128,26 +132,43 @@ class FileIndexer:
             #
         #
     #
+    """
     
-    def get_location(self, idx: int) -> Any:
-        (data_idx, loc_idx) = self.g_ref[idx]
-        locations: Sequence[Any] = self.data[data_idx].locations
-        return locations[loc_idx]
+    def __init__(self, files_info_iter: Iter_t[FilesInfo]):
+        self.data: List[Tuple[Location, ReaderFunc, SizeFunc]] = list()
+        # ex. data = [["path1", reader, size_getter], ["path2", ...,...]]
+        for files_info in files_info_iter:
+            reader: ReaderFunc = files_info.reader_func
+            size_fun: SizeFunc = files_info.size_getter
+            
+            for loc in files_info.locations:
+                file_info: Tuple[Location, ReaderFunc, SizeFunc] = \
+                    (loc, reader, size_fun)
+                    
+                self.data.append(file_info)
+            #
     #
     
-    def get_reader(self, idx: int) -> Callable[[Any, int, int], bytes]:
-        data_pos = self.g_ref[idx]
-        return self.data[data_pos[0]].reader_func
+    
+    
+    def get_location(self, idx: int) -> Location:
+        info: Tuple[Location, ReaderFunc, SizeFunc] = self.data[idx]
+        return info[0]
     #
     
-    def get_size_func(self, idx: int) -> Callable[[Any], int]:
-        data_pos = self.g_ref[idx]
-        return self.data[data_pos[0]].size_getter
+    def get_reader(self, idx: int) -> ReaderFunc:
+        info: Tuple[Location, ReaderFunc, SizeFunc] = self.data[idx]
+        return info[1]
+    #
+    
+    def get_size_func(self, idx: int) -> SizeFunc:
+        info: Tuple[Location, ReaderFunc, SizeFunc] = self.data[idx]
+        return info[2]
     #
     
     def get_max_idx(self) -> int:
         # Total number of locations minus 1.
-        return len(self.g_ref)
+        return len(self.data)
     #
     
     def get_all_indices(self) -> List[int]:

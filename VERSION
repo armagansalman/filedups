@@ -1,6 +1,6 @@
-(2021-12-22) Current Version = 0.2.1
+(2021-12-26) Current Version = 0.3.2
 
-
+-[
 This project uses Semantic Versioning 2.0.0
 
 Following lines were taken from https://semver.org
@@ -13,6 +13,25 @@ Following lines were taken from https://semver.org
 	MINOR version when you add functionality in a backwards compatible manner, and
 	PATCH version when you make backwards compatible bug fixes.
 	Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
+]+
+
+
+=== VERSION HISTORY ===
+
+-[
+semver(2.0.0) = 0.3.2
+
+- FileIndexer data changed to a flat version. A list of triples.
+self.data: List[Tuple[Location, ReaderFunc, SizeFunc]]
+]+
+
+
+-[
+semver(2.0.0) = 0.3.1
+
+- Can recursively apply grouper functions to indices using DuplicateFinder
+rec_apply function.
+]+
 
 
 -[
@@ -22,5 +41,4 @@ semver(2.0.0) = 0.2.1
 locations.
 
 - grouper_funs.py added. Each function is a search pass over locations.
-
-]-
+]+

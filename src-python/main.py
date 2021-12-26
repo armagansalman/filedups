@@ -24,7 +24,8 @@
 # WARNING: Don't use print on Windows. Errors like "UnicodeEncodeError: 
 # 'charmap' codec can't encode character '\u015f'" can occur
 
-# NOTE(armagan): 512 bytes seem reasonable for the first pass.
+# NOTE(armagan): 512 bytes seem reasonable for the first pass (0th pass is always by size).
+# NOTE(armagan): 8 kilo bytes seem reasonable for the second pass.
 # TODO(armagan): For printing paths, split filename, write filename first.
 # then write its path.
 
@@ -81,48 +82,10 @@ for i in range(FIDX.get_idx_count()):
 
 
 tmp_dict: Dict[str, Set] = dict() # Set makes every location unique.
-
-
-def file_grouper(FXR: FileIndexer, MATCH_PERCENTAGE: float) \
--> Iter_t[Iter_t[int]]:
-    # Returns multiple groups of file indices. Files in each group are
-    # duplicates to the degree given by MATCH_PERCENTAGE.
-    
-    
-    
-    
-    z1 = [1,2]
-    z2 = {3,4,5}
-    return list([z1, z2])
-#
-
-"""
-res = file_grouper(FIDX, 0.23)
-
-print(res)
-
-data = UT.local_file_reader("./main.py", 0, 15)
-
-print("<",data,">")
-"""
-
-
-"""
-GIVEN_PATHS: List[str]= [ \
-"/home/public/Pictures/Aile family/" \
-, "/home/public/Pictures/Aile family/" ]
-"""
-
-GIVEN_PATHS: List[str] = \
-[
-"/home/public" \
-]
-
-
+#######
 
 get_nonzero_length_files = UT.get_nonzero_length_files
-# aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-
+#######
 
 
 
@@ -236,7 +199,7 @@ def main_1():
 #
 
 
-def main_2():
+def main_2(HASH_BYTES):
     
     TM_beg = time.perf_counter()
     print("HASH_BYTES=", HASH_BYTES)
@@ -496,7 +459,11 @@ def main_3(out_fpath, IN_PATHS, HASH_SIZE, SMALLEST_FSIZE):
     #
 #
 
-def main_4(out_fpath, IN_PATHS: List[str], HASH_SIZE, SMALLEST_FSIZE):
+
+#from memory_profiler import profile
+
+#@profile
+def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     string_seq: List = []
     
     string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
@@ -559,11 +526,15 @@ def main_4(out_fpath, IN_PATHS: List[str], HASH_SIZE, SMALLEST_FSIZE):
     FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
+    hs1 = 512
+    hs2 = 8 * CONST.xKB
     
+    grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
+     , GRPR.sha512_first_X_bytes(X=hs1) \
+     , GRPR.sha512_first_X_bytes(X=hs2) ]
     
-    grouper_funcs = [ GRPR.group_by_size \
-     , GRPR.sha512_first_X_bytes(X=512) \
-     , GRPR.sha512_first_X_bytes(X=2048) ]
+    string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(hs1,hs2)] )
+    string_seq.append('\n')
     
     found_groups: LocationGroups_t = FINDER.apply_multiple_groupers(\
                                     all_indices, grouper_funcs)
@@ -589,7 +560,7 @@ def main_4(out_fpath, IN_PATHS: List[str], HASH_SIZE, SMALLEST_FSIZE):
             # ??https://github.com/tobgu/pyrsistent
             
             loc = FINDER.get_file_indexer().get_location(loc_idx)
-            string_seq.extend( ["Full path:", loc])
+            string_seq.extend( ["File path:", loc])
             string_seq.append('\n')
             string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
             string_seq.append('\n')
@@ -652,7 +623,7 @@ for i in range(3):
     
     OUTFILE_PATH = "{}_bigger than ({} bytes).txt".format(NOW, smallest_file_size)
     
-    HASH_BYTES: int = 1 * CONST.xKB # Unnecessary (2021-12-23).
+    
 
     
     
@@ -661,13 +632,13 @@ for i in range(3):
     #main_3(OUTFILE_PATH, search_paths_WINDOWS, HASH_BYTES, smallest_file_size)
     
     
-    search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
+    _search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
     , "/media/genel/Bare-Data/Documents/" \
     , "/media/genel/Bare-Data/HxD/" \
     , "/media/genel/Bare-Data/Program Files/"]
     
     
-    _search_paths_MINT = ["/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
+    _search_paths = ["/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
     , "/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
     , "/media/genel/SAMSUNG/NOT SAMS/Aile fotolar, videolar/" \
     , "/media/genel/SAMSUNG/NOT SAMS/Aile family/"]
@@ -677,10 +648,23 @@ for i in range(3):
     
     _search_paths_MINT = ["/home/genel/"]
     
-    _search_paths = ["/home/genel/"]
+    search_paths = ["/home/genel/"]
     
-    search_paths = ["/media/genel/Bare-Data/"]
+    _search_paths = ["/media/genel/Bare-Data/"]
     
-    main_4(OUTFILE_PATH, search_paths, HASH_BYTES, smallest_file_size)
+    # TODO(armagan): Separate apply func. and write to file.
+    # TODO(armagan): Create LocalFileFinder
+    # TODO(armagan): Combine 1 byte size filter and size grouper for performance.
+    
+    main_4(OUTFILE_PATH, search_paths, smallest_file_size)
 #
 
+"""
+350871 items, totalling 759,9 GiB (815.983.211.147 bytes) = ext-disk,NOT SAM
+"""
+
+"""
+ELAPSED: 56.87620095499733 seconds. 
+ 17354 files.
+ ~300 files/second
+"""

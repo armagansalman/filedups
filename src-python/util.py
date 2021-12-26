@@ -178,24 +178,26 @@ def write_file_utf8(fpath: str, text: str, OPEN_MODE: str):
 
 
 def append_file_list_utf8(fpath: str, data: List):
-    print("[ INFO ] Appended to file:", fpath)
     write_file_utf8(fpath, ''.join(data), 'a')
+    print("[ INFO ] Appended to file:", fpath)
 #
 
 
 def append_file_text_utf8(fpath: str, text: str):
-    print("[ INFO ] Appended to file:", fpath)
     write_file_utf8(fpath, text, 'a')
+    print("[ INFO ] Appended to file:", fpath)
 #
 
 
 def write_file_text_utf8(fpath: str, text: str, FORCE_OVERWRITE = False):
-    # Write text to file.
+    # Write text(utf8) to file.
     if os.path.exists(fpath) and FORCE_OVERWRITE == True:
         write_file_utf8(fpath, text, 'w')
         print("[ INFO ] Written (mode = w) to file:", fpath)
+        return True
     #
     else:
         print("[ WARNING ] NO text was written to file: '", fpath, "' FORCE_OVERWRITE = ", FORCE_OVERWRITE)
+        return False
     #
 #
