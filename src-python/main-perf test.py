@@ -47,11 +47,7 @@ Cold-start:
 
 import time
 
-from typing import Set
-from typing import Sequence
-from typing import AnyStr
-from typing import Dict
-from typing import Iterable as Iter
+from common_types import *
 
 from collections.abc import Iterable
 
@@ -125,8 +121,8 @@ for i in range(3):
 	
 	for p in UT.get_fpaths_from_path_iter(GIVEN_PATHS):
 		try:
-			sz = UT.get_file_size_in_bytes(p)
-			if sz > 0:
+			sz: MaybeInt = UT.get_file_size_in_bytes(p)
+			if is_some(sz) and get_data(sz) > 0:
 				paths.append(p)
 				szs.append(sz)
 		except:

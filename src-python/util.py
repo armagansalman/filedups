@@ -86,12 +86,18 @@ def get_fpaths_from_path_iter(paths_iter: List[str]):
 #
 
 
-def get_file_size_in_bytes(path):
-    statinfo = os.stat(path)
-    return statinfo.st_size
+def get_file_size_in_bytes(path) -> MaybeInt:
+    try:
+        statinfo = os.stat(path)
+        return make_some(statinfo.st_size)
+    #
+    except: # TODO(armagan): Report/except when exception occurs.
+        # Don't fail silently.
+        return make_nothing()
+    #    
 #
 
-def get_local_file_size(PATH: str) -> int:
+def get_local_file_size(PATH: str) -> MaybeInt:
 	return get_file_size_in_bytes(PATH)
 #
 
@@ -101,20 +107,25 @@ def get_nonzero_length_files(paths_arg: List[str]):
     
     for p in get_fpaths_from_path_iter(paths_arg):
         try:
-            sz = get_file_size_in_bytes(p)
-            if sz >= 1:
+            sz: MaybeInt = get_file_size_in_bytes(p)
+            if is_nothing(sz):
+                continue
+            #
+            if get_data(sz) >= 1:
                 paths.add(p)
-        except:
+        except: # TODO(armagan): Report/except when exception occurs.
             pass
     #
     
     return paths
 #
 
-def local_file_reader(file_path: str, start_offset: int, end_offset: int) -> bytes:
+
+def local_file_reader(file_path: str, start_offset: int, \
+        end_offset: int) -> Tuple[bool, bytes]:
     # Includes bytes at start_offset and end_offset
     try:
-        data = None
+        data: bytes = b'0'
         
         #TODO(armagan): Read by chunks.
         with open(file_path, "rb") as in_fobj:
@@ -122,16 +133,18 @@ def local_file_reader(file_path: str, start_offset: int, end_offset: int) -> byt
             data = in_fobj.read(end_offset - start_offset + 1)
         #
         
-        return data
-    except: # TODO(armagan): Use Optional type to return bytes or None.
-        return None
+        return make_some(data)
+    except: # TODO(armagan): Report/except when None.
+        return make_nothing()
 #
+
 
 def sha512_bytes(data: bytes):
 	hs = hashlib.sha512()
 	hs.update(data)
 	return hs.hexdigest()
 #
+
 
 def file_sha512(file_path, size_to_read):
     hs = hashlib.sha512()
@@ -144,6 +157,7 @@ def file_sha512(file_path, size_to_read):
     hs.update(data)
     return hs.hexdigest()
 #
+
 
 """
 def getSHA256(currentFile, full=False):

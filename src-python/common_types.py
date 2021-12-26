@@ -35,9 +35,41 @@ from typing import Tuple
 from typing import Sized
 
 from typing import TypeVar
+# from typing import Optional
+
+# from typing import TypeAlias  # "from typing_extensions" in Python 3.9 and earlier
+
 
 LocationIndices_t = Set[int]
 LocationGroups_t = Iter_t[LocationIndices_t]
 
-
 # Iterable_t = Iter_t
+
+Maybe = Tuple[bool, Any]
+MaybeInt = Tuple[bool, int]
+
+def make_some(data: Any) -> Maybe:
+    return (True, data)
+#
+
+
+def make_nothing() -> Maybe:
+    return (False, False) # Second field is unimportant
+#
+
+
+def is_some(arg: Maybe) -> bool:
+    return arg[0] == True
+#
+
+
+def is_nothing(arg: Maybe) -> bool:
+    return arg[0]  == False
+#
+
+
+def get_data(arg: Maybe) -> Any:
+    return arg[1]
+#
+
+
