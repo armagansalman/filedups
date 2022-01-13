@@ -318,7 +318,14 @@ if __name__ == "__main__":
         , "/media/genel/Bare-Data/HxD/" \
         , "/media/genel/Bare-Data/Program Files/"]
     #
-    search_paths = search_paths_MINT
+    
+    search_paths_WIN10 = ["D:\ALL BOOKS-PAPERS" \
+        , "D:\Documents" \
+        , "D:\HxD" \
+        , "D:\Program Files"]
+    #
+    
+    search_paths = ["D:\\"] # or "D:/"
     # trials(3, search_paths) # for performance measurement of cold/hot data.
     trials(1, search_paths) # 1 == Just to find local duplicates.
 #
