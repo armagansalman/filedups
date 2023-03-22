@@ -154,7 +154,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
         
         # TODO(Armagan): Tidy up this mess of a function.
         
-        X = 1
+        X = 3
         
         if fsize < 1024 * X: # skip if not at least X MB
             continue
