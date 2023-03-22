@@ -36,7 +36,7 @@ def get_utc_datetime_now():
 
 def get_now_str():
     now = get_utc_datetime_now()
-    now_str = "{}-{}-{}_{}-{}-{}".format(now.year, now.month, now.day, now.hour \
+    now_str = "{}-{}-{}T{}-{}-{}".format(now.year, now.month, now.day, now.hour \
     , now.minute, now.second)
     return now_str
 #

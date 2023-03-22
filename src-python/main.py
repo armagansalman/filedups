@@ -137,13 +137,13 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     #
     """
     
-    i = 0
-    for seq in found_groups:
+    #idx_grp = 0
+    for idx_grp, seq in enumerate(found_groups):
         if len(list(seq)) < 2:
             continue # Skip unique files.
         
-        string_seq.append("+++++++++++ [Group {}] start +++++++".format(i))
-        string_seq.append('\n')
+        #string_seq.append("+++++++++++ [Group {}] start +++++++".format(i))
+        #string_seq.append('\n')
         
         for loc_idx in seq:
             # TODO(armagan): This is an ugly way and code. Use PyConst or
@@ -157,11 +157,11 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
             string_seq.append('\n')
             string_seq.append('\n')
         #
-        string_seq.append("----------- [Group {}] END -------".format(i))
+        string_seq.append("----------- [Group {}] END -------".format(idx_grp))
         string_seq.append('\n')
         string_seq.append('\n')
         
-        i += 1
+        #idx_grp += 1
     #
     """"""
     TM_end = time.perf_counter()
