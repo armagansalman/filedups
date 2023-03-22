@@ -1,9 +1,15 @@
+.*
 *.txt
 *.bak
 *.7z
 __pycache__/
 local/
 *.mypy*
+
+
+# DON'T IGNORE THESE:
+!.gitignore
+
 
 
 # These are some examples of commonly ignored file patterns.

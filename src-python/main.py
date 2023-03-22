@@ -115,12 +115,14 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
-    hs1 = 512
-    hs2 = 4 * CONST.xKB
+    hs1 = 32
+    hs2 = 512 * CONST.xBYTE
+    #hs2 = 1 * CONST.xKB
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
      , GRPR.sha512_first_X_bytes(X=hs1) \
-     , GRPR.sha512_first_X_bytes(X=hs2) ]
+    , GRPR.sha512_first_X_bytes(X=hs2) \
+    ]
     
     string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(hs1,hs2)] )
     string_seq.append('\n')
@@ -197,26 +199,11 @@ def trials(trial_count: int, search_paths: List[str]):
     NOW = UT.get_now_str()
 
     for i in range(trial_count):
-        smallest_file_size: int = 1 * CONST.xBYTE
+        smallest_file_size: int = 32 * CONST.xKB
         
-        OUTFILE_PATH = "{}_at least({} bytes).txt".format(NOW, smallest_file_size)
+        OUTFILE_PATH = ".{}_at least({} bytes).txt".format(NOW, smallest_file_size)
 
         #search_paths_WINDOWS = ["D:\ALL BOOKS-PAPERS", "D:\Documents", "D:\HxD", "D:\Program Files"]
-
-        """
-        _search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
-        , "/media/genel/Bare-Data/Documents/" \
-        , "/media/genel/Bare-Data/HxD/" \
-        , "/media/genel/Bare-Data/Program Files/"]
-        """
-        
-        """
-        _search_paths = ["/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
-        , "/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
-        , "/media/genel/SAMSUNG/NOT SAMS/Aile fotolar, videolar/" \
-        , "/media/genel/SAMSUNG/NOT SAMS/Aile family/"]
-        # search_paths_MINT = "/media/genel/SAMSUNG/NOT SAMS/Alltxt files/"
-        """
         
         # _search_paths_MINT = ["/media/genel/Bare-Data/"]
         
@@ -325,8 +312,23 @@ if __name__ == "__main__":
         , "D:\Program Files"]
     #
     
-    search_paths = ["D:\\"] # or "D:/"
+    search_paths = ["/home/genel/"] # or "D:/"
     # trials(3, search_paths) # for performance measurement of cold/hot data.
     trials(1, search_paths) # 1 == Just to find local duplicates.
 #
 
+
+"""
+_search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
+, "/media/genel/Bare-Data/Documents/" \
+, "/media/genel/Bare-Data/HxD/" \
+, "/media/genel/Bare-Data/Program Files/"]
+"""
+
+"""
+_search_paths = ["/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
+, "/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
+, "/media/genel/SAMSUNG/NOT SAMS/Aile fotolar, videolar/" \
+, "/media/genel/SAMSUNG/NOT SAMS/Aile family/"]
+# search_paths_MINT = "/media/genel/SAMSUNG/NOT SAMS/Alltxt files/"
+"""
