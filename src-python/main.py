@@ -3,7 +3,7 @@
     armaganymmt-prj-1_name processes files from different kinds of
     locations to find duplicate files.>
     
-    Copyright (C) <2021>  <Armağan Salman> <gmail,protonmail: armagansalman>
+    Copyright (C) <2021-2023>  <Armağan Salman> <gmail,protonmail: armagansalman>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -138,28 +138,45 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     """
     
     #idx_grp = 0
-    for idx_grp, seq in enumerate(found_groups):
-        if len(list(seq)) < 2:
+    for idx_grp, grp in enumerate(found_groups):
+        
+        grp = list(grp)
+        if len(grp) < 2:
             continue # Skip unique files.
         
         #string_seq.append("+++++++++++ [Group {}] start +++++++".format(i))
         #string_seq.append('\n')
         
-        for loc_idx in seq:
+        loc_idx = grp[0]
+        loc = FINDER.FIDX.get_location(loc_idx)
+        fsize_tpl = FINDER.FIDX.get_size_func(loc_idx)(loc)
+        fsize = fsize_tpl[1] / 1024
+        
+        # TODO(Armagan): Tidy up this mess of a function.
+        
+        X = 1
+        
+        if fsize < 1024 * X: # skip if not at least X MB
+            continue
+        
+        string_seq.append('~\n')
+        
+        for loc_idx in grp:
             # TODO(armagan): This is an ugly way and code. Use PyConst or
             # immutable data structures instead of class/objects.
             # ??https://github.com/tobgu/pyrsistent
             
-            loc = FINDER.get_file_indexer().get_location(loc_idx)
-            string_seq.extend( ["File path:", loc])
+            loc = FINDER.FIDX.get_location(loc_idx)
+            
+            string_seq.extend( [f"G: {idx_grp} ; SZ: {fsize:3.2f} (KB) ; P: {loc}"])
             string_seq.append('\n')
-            string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
-            string_seq.append('\n')
-            string_seq.append('\n')
+            #string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
+            #string_seq.append('\n')
+            #string_seq.append('\n')
         #
-        string_seq.append("----------- [Group {}] END -------".format(idx_grp))
-        string_seq.append('\n')
-        string_seq.append('\n')
+        #string_seq.append("----------- [Group {}] END -------".format(idx_grp))
+        #string_seq.append('\n')
+        #string_seq.append('\n')
         
         #idx_grp += 1
     #
@@ -201,7 +218,7 @@ def trials(trial_count: int, search_paths: List[str]):
     for i in range(trial_count):
         smallest_file_size: int = 32 * CONST.xKB
         
-        OUTFILE_PATH = ".{}_at least({} bytes).txt".format(NOW, smallest_file_size)
+        OUTFILE_PATH = ".{} (at least ({} bytes)).txt".format(NOW, smallest_file_size)
 
         #search_paths_WINDOWS = ["D:\ALL BOOKS-PAPERS", "D:\Documents", "D:\HxD", "D:\Program Files"]
         

@@ -113,6 +113,8 @@ class FilesInfo:
 FileTriple = Tuple[Location, ReaderFunc, SizeFunc]
 
 class FileIndexer:
+    data = None
+    
     def __init__(self, files_info_iter: Iter_t[FilesInfo]):
         self.data: List[FileTriple] = list()
         # data = [["path1", reader, size_getter], ["path2", ...,...]]
@@ -173,6 +175,8 @@ GroupFunc_t = Callable[[FileIndexer, LocationIndices_t, \
 
 
 class DuplicateFinder:
+    FIDX = None  # File Indexer
+	
     def __init__(self, FILE_INDEXER: FileIndexer, \
                 SIMILARITY_PERCENTAGE: float):
         self.FIDX = FILE_INDEXER
