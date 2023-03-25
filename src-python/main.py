@@ -49,7 +49,7 @@ import grouper_funs as GRPR
 #from memory_profiler import profile
 
 #@profile
-def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
+def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
     string_seq: List = []
     
     string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
@@ -60,9 +60,9 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
     string_seq.append('\n')
     
-    string_seq.append("Paths: ")
-    string_seq.extend( IN_PATHS )
-    string_seq.append('\n')
+    string_seq.append("Paths: \n")
+    string_seq.append( '\n'.join(IN_PATHS) )
+    string_seq.append('\n\n')
     
     TM_beg = time.perf_counter()
     
@@ -102,7 +102,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     
     # fls: Set[str] = UT.get_nonzero_length_files(IN_PATHS)
     
-    string_seq.extend( ["Total number of files to search=", len(locations)] )
+    string_seq.extend( ["Total number of filtered files to search=", len(locations)] )
     string_seq.append('\n')
     
 
@@ -115,8 +115,8 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
-    hs1 = 32
-    hs2 = 512 * CONST.xBYTE
+    hs1 = 32 * CONST.xBYTE
+    hs2 = 1024 * CONST.xBYTE
     #hs2 = 1 * CONST.xKB
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
@@ -125,6 +125,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
     ]
     
     string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(hs1,hs2)] )
+    #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
     string_seq.append('\n')
     
     found_groups: LocationGroups_t = FINDER.apply_multiple_groupers(\
@@ -168,7 +169,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
             
             loc = FINDER.FIDX.get_location(loc_idx)
             
-            string_seq.extend( [f"G: {idx_grp} ; SZ: {fsize:3.2f} (KB) ; P: {loc}"])
+            string_seq.extend( [f"G: {idx_grp} ; S: {fsize:3.2f} (KB) ; P: {loc}"])
             string_seq.append('\n')
             #string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
             #string_seq.append('\n')
@@ -212,29 +213,18 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FSIZE):
 #
 
 
-def trials(trial_count: int, search_paths: List[str]):
+def trials(trial_count: int, search_paths: List[str], SMALLEST_FILE_SIZE: int):
     NOW = UT.get_now_str()
 
     for i in range(trial_count):
-        smallest_file_size: int = 32 * CONST.xKB
         
-        OUTFILE_PATH = ".{} (at least ({} bytes)).txt".format(NOW, smallest_file_size)
-
-        #search_paths_WINDOWS = ["D:\ALL BOOKS-PAPERS", "D:\Documents", "D:\HxD", "D:\Program Files"]
-        
-        # _search_paths_MINT = ["/media/genel/Bare-Data/"]
-        
-        # _search_paths_MINT = ["/home/genel/"]
-        
-        # _search_paths = ["/home/genel/"]
-        
-        # _search_paths = ["/media/genel/Bare-Data/"]
+        OUTFILE_PATH = "filedups ({}) (at least ({:2.2f} bytes)).txt".format(NOW, SMALLEST_FILE_SIZE/1024)
         
         # TODO(armagan): Separate apply func. and write to file.
         # TODO(armagan): Create LocalFileFinder
         # TODO(armagan): Combine 1 byte size filter and size grouper for performance.
         
-        main_4(OUTFILE_PATH, search_paths, smallest_file_size)
+        main_4(OUTFILE_PATH, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FILE_SIZE)
     #
 
     """
@@ -259,79 +249,36 @@ def trials(trial_count: int, search_paths: List[str]):
 #
 
 
-def group_local_files(IN_PATHS: List[str], \
-        GROUP_FUNCS: List[GroupFunc_t]) -> LocationGroups_t:
-    # TODO(armagan): ??? Make this a separate class.
-    
-    paths_unfiltered: Set[str] = UT.get_fpaths_from_path_iter(IN_PATHS)
-    
-    fsinfo = FilesInfo(paths_unfiltered, UT.local_file_reader, \
-                        UT.get_local_file_size)
-    #
-    FINDX = FileIndexer([fsinfo])
-    
-    FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
-    
-    all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
-    
-    found_groups: LocationGroups_t = FINDER.apply_multiple_groupers( \
-                                    all_indices, GROUP_FUNCS)
-    #
-    return found_groups
-#
-
-
-def local_grouper_main(IN_PATHS: List[str]):
-    # TODO(armagan): Make this a separate class.
-    SMALLEST_FSIZE: int = 1 * CONST.xBYTE
-    hs1 = 512
-    hs2 = 4 * CONST.xKB
-    
-    grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
-        , GRPR.sha512_first_X_bytes(X=hs1) \
-        , GRPR.sha512_first_X_bytes(X=hs2) ]
-    #
-    string_seq: List = []
-    
-    string_seq.extend( ["======= filedups local_grouper_main beginning ======= "] )
-    string_seq.append('\n')
-    
-    now_str = UT.get_now_str()
-    
-    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
-    string_seq.append('\n')
-    
-    string_seq.append("Paths: ")
-    string_seq.extend( IN_PATHS )
-    string_seq.append('\n')
-    
-    string_seq.extend( ["SMALLEST_FSIZE(bytes)=", SMALLEST_FSIZE] )
-    string_seq.append('\n')
-    
-    TM_beg = time.perf_counter()
-    
-    # TODO(armagan): Continue writing this function.
-    
-#
-
-
 if __name__ == "__main__":
+    # TODO(Armağan): Given args for directories OR do gui as explained below:
+    # TODO(Armağan): Use PySimpleGUI to select input text file that holds search directories.
     # 
-    search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
+    _search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
         , "/media/genel/Bare-Data/Documents/" \
         , "/media/genel/Bare-Data/HxD/" \
         , "/media/genel/Bare-Data/Program Files/"]
     #
     
-    search_paths_WIN10 = ["D:\ALL BOOKS-PAPERS" \
+    _search_paths_WIN10 = ["D:\ALL BOOKS-PAPERS" \
         , "D:\Documents" \
         , "D:\HxD" \
         , "D:\Program Files"]
     #
     
-    search_paths = ["/home/genel/"] # or "D:/"
+    _search_paths = ["/home/genel/"] # or "D:/"
     # trials(3, search_paths) # for performance measurement of cold/hot data.
-    trials(1, search_paths) # 1 == Just to find local duplicates.
+    
+    
+    search_paths = [ \
+        "/media/genel/SAMSUNG/NOT SAMS/BCK~_2023-01-18T11_/" \
+        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~_2023-02-20T13_/" \
+        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~HP~_2022-05-06_/" \
+        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~Mint~_2022-12-17_/" \
+        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~Sandisk-32GB~_2023-02-20_/" \
+    ]
+    
+    SMALLEST_FSIZE = 32 * CONST.xKB
+    trials(1, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FSIZE) # 1 == Just to find local duplicates.
 #
 
 

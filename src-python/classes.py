@@ -202,11 +202,9 @@ class DuplicateFinder:
                     GROUPERS: List[GroupFunc_t]) -> LocationGroups_t:
         #
         locs: Set[int] = set(LOCS)
-        if len(locs) < 2: # Fewer than 2 files can't be duplicates.
-            return [locs]
-        #
-        
-        if FUNC_IDX >= len(GROUPERS): # No grouper func. left to apply.
+        if len(locs) < 2 or FUNC_IDX >= len(GROUPERS):
+            # Fewer than 2 files can't be duplicates. 
+            # OR No grouper func. left to apply.
             return [locs]
         #
         
