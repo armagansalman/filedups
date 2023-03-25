@@ -257,7 +257,7 @@ def check_existence_paths(paths: list):  #(
     
     for idx, pt in enumerate(paths):  #(
         if not os.path.exists(pt):
-            raise Exception(f"Path doesn't exist. Paths:{paths}\nPath index: {idx}")
+            raise Exception(f"Path doesn't exist.\nPath index: {idx}\nPaths:{paths}\n")
     #)
 #)
 

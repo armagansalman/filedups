@@ -13,7 +13,7 @@ Put full paths of directories you want to search in in-dirs.txt file on separate
 <br>or
 <br>**python3 main.py in-dirs.txt**
 
-<br>Results will be in a text file, which starts with filedups and contains timestamp of scan.
+<br>Results will be in a text file, which starts with filedups and contains timestamp of the scan.
 
 ### Notes
 36652 beginning files, 11002 files after filter, size,64-hash,1024-hash TOOK 164 seconds (on USB 2.0, external 5400 rpm hard disk).
