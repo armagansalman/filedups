@@ -142,8 +142,8 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
     #
     """
     
-    #idx_grp = 0
-    for idx_grp, grp in enumerate(found_groups):
+    idx_grp = 0
+    for i, grp in enumerate(found_groups):
         
         grp = list(grp)
         if len(grp) < 2:
@@ -173,7 +173,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
             
             loc = FINDER.FIDX.get_location(loc_idx)
             
-            string_seq.extend( [f"T.1 ; G: {idx_grp} ; S: {fsize:3.2f} (KB) ; P: {loc}"])
+            string_seq.extend( [f"T.1 ; G: {idx_grp} ; S: {fsize:1.2f} (KB) ; P: {loc}"])
             string_seq.append('\n')
             #string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
             #string_seq.append('\n')
@@ -183,7 +183,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
         #string_seq.append('\n')
         #string_seq.append('\n')
         
-        #idx_grp += 1
+        idx_grp += 1
     #
     """"""
     TM_end = time.perf_counter()
@@ -199,7 +199,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
     indices: List[int] = FINDX.get_all_indices()
     
     #print(len(indices))
-    string_seq.extend( [len(indices)] )
+    string_seq.extend( [f"Total file count for grouping was: {len(indices)}"] )
     string_seq.append('\n')
     
     #print(indices[:7])
@@ -252,6 +252,15 @@ def trials(trial_count: int, search_paths: List[str], SMALLEST_FILE_SIZE: int):
     """
 #
 
+def check_existence_paths(paths: list):  #(
+    import os
+    
+    for idx, pt in enumerate(paths):  #(
+        if not os.path.exists(pt):
+            raise Exception(f"Path doesn't exist. Paths:{paths}\nPath index: {idx}")
+    #)
+#)
+
 
 if __name__ == "__main__":
     # TODO(Armağan): Given args for directories OR do gui as explained below:
@@ -278,6 +287,10 @@ if __name__ == "__main__":
     
     search_paths_iter = map(lambda p: p.strip() , in_txt_file_lines)  # Remove prefix and suffix blank characters.
     search_paths = list(search_paths_iter)
+    
+    check_existence_paths(search_paths)
+    
+    print("<[ INFO ]> Finding duplicates...")
     
     SMALLEST_FSIZE = 32 * CONST.xKB
     trials(1, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FSIZE) # 1 == Just to find local duplicates.
