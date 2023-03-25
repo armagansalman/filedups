@@ -263,6 +263,7 @@ def check_existence_paths(paths: list):  #(
 
 
 if __name__ == "__main__":
+    # TODO(Armağan): Restructure and clean the code.
     # TODO(Armağan): Given args for directories OR do gui as explained below:
     # TODO(Armağan): Use PySimpleGUI to select input text file that holds search directories.
     # 
