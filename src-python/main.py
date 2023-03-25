@@ -115,7 +115,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
     FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
-    hs1 = 32 * CONST.xBYTE
+    hs1 = 64 * CONST.xBYTE
     hs2 = 1024 * CONST.xBYTE
     #hs2 = 1 * CONST.xKB
     
@@ -125,6 +125,10 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
     ]
     
     string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(hs1,hs2)] )
+    #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
+    string_seq.append('\n')
+    
+    string_seq.extend( ["T.1 ; == ; Group id ; File size ; File Path"] )
     #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
     string_seq.append('\n')
     
@@ -151,13 +155,13 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
         loc_idx = grp[0]
         loc = FINDER.FIDX.get_location(loc_idx)
         fsize_tpl = FINDER.FIDX.get_size_func(loc_idx)(loc)
-        fsize = fsize_tpl[1] / 1024
+        fsize = fsize_tpl[1] / 1024  # Turns from BYTE -> KB
         
         # TODO(Armagan): Tidy up this mess of a function.
         
-        X = 3
+        SKIP_SIZE = 100
         
-        if fsize < 1024 * X: # skip if not at least X MB
+        if fsize < SKIP_SIZE: # skip if not at least SKIP_SIZE KB
             continue
         
         string_seq.append('~\n')
@@ -169,7 +173,7 @@ def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
             
             loc = FINDER.FIDX.get_location(loc_idx)
             
-            string_seq.extend( [f"G: {idx_grp} ; S: {fsize:3.2f} (KB) ; P: {loc}"])
+            string_seq.extend( [f"T.1 ; G: {idx_grp} ; S: {fsize:3.2f} (KB) ; P: {loc}"])
             string_seq.append('\n')
             #string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
             #string_seq.append('\n')
@@ -253,6 +257,35 @@ if __name__ == "__main__":
     # TODO(Armağan): Given args for directories OR do gui as explained below:
     # TODO(Armağan): Use PySimpleGUI to select input text file that holds search directories.
     # 
+    import sys
+    
+    if len(sys.argv) < 2:  #(
+        raise Exception("No input file given as argument. Aborted.")
+    #)
+    
+    arg_list = sys.argv[1:]
+    
+    first_arg: str = arg_list[0]  # .txt file which holds a dir path on each line.
+    
+    assert(first_arg.endswith(".txt"))
+    
+    in_fname = first_arg
+    #print(f"Input text file name: {in_fname}")
+    
+    
+    #print("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~")
+    in_txt_file_lines = UT.read_file_text(in_fname)
+    
+    search_paths_iter = map(lambda p: p.strip() , in_txt_file_lines)  # Remove prefix and suffix blank characters.
+    search_paths = list(search_paths_iter)
+    
+    SMALLEST_FSIZE = 32 * CONST.xKB
+    trials(1, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FSIZE) # 1 == Just to find local duplicates.
+#
+
+
+""" if __
+
     _search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
         , "/media/genel/Bare-Data/Documents/" \
         , "/media/genel/Bare-Data/HxD/" \
@@ -265,22 +298,19 @@ if __name__ == "__main__":
         , "D:\Program Files"]
     #
     
-    _search_paths = ["/home/genel/"] # or "D:/"
+    search_paths = ["/home/genel/"] # or "D:/"
     # trials(3, search_paths) # for performance measurement of cold/hot data.
     
     
-    search_paths = [ \
+    _search_paths = [ \
         "/media/genel/SAMSUNG/NOT SAMS/BCK~_2023-01-18T11_/" \
         ,"/media/genel/SAMSUNG/NOT SAMS/BCK~_2023-02-20T13_/" \
         ,"/media/genel/SAMSUNG/NOT SAMS/BCK~HP~_2022-05-06_/" \
         ,"/media/genel/SAMSUNG/NOT SAMS/BCK~Mint~_2022-12-17_/" \
         ,"/media/genel/SAMSUNG/NOT SAMS/BCK~Sandisk-32GB~_2023-02-20_/" \
     ]
-    
-    SMALLEST_FSIZE = 32 * CONST.xKB
-    trials(1, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FSIZE) # 1 == Just to find local duplicates.
-#
 
+"""
 
 """
 _search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \

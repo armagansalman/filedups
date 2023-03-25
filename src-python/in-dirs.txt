@@ -1,0 +1,3 @@
+/home/genel/
+/home/genel/DATA/
+/home/genel/Pictures/

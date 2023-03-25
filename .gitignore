@@ -4,13 +4,17 @@
 *.7z
 *.mypy*
 
+#( Ignore these folders:
 __pycache__/
 local/
 output/
+#)
+
 
 #( DON'T IGNORE THESE:
 
 !.gitignore
+!in-dirs.txt
 
 #)
 

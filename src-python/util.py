@@ -203,7 +203,7 @@ def append_file_text_utf8(fpath: str, text: str):
 #
 
 
-def write_file_text_utf8(fpath: str, text: str, FORCE_OVERWRITE = False):
+def write_file_text_utf8(fpath: str, text: str, FORCE_OVERWRITE = False):  #(
     # Write text(utf8) to file.
     if os.path.exists(fpath) and FORCE_OVERWRITE == True:
         write_file_utf8(fpath, text, 'w')
@@ -214,4 +214,14 @@ def write_file_text_utf8(fpath: str, text: str, FORCE_OVERWRITE = False):
         print("[ WARNING ] NO text was written to file: '", fpath, "' FORCE_OVERWRITE = ", FORCE_OVERWRITE)
         return False
     #
+#)
+
+
+def read_file_text(fpath: str, encoding: str = 'utf8'):  #(
+    if not os.path.exists(fpath):
+        raise Exception(f"File not found. Path: {fpath}")
+    
+    with open(fpath, 'r', encoding = encoding) as fr:  #(
+        return fr.readlines()
+    #)
 #
