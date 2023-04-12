@@ -3,7 +3,7 @@
     armaganymmt-prj-1_name processes files from different kinds of
     locations to find duplicate files.>
     
-    Copyright (C) <2021>  <Armağan Salman> <gmail,protonmail: armagansalman>
+    Copyright (C) <2021-2023>  <Armağan Salman> <gmail,protonmail: armagansalman>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import hashlib
 import io
 import datetime
 
+import common_types as CT
 from common_types import *
 
 
@@ -70,6 +71,54 @@ def get_fpaths_recursively_from_folder(PATH: str):
     return rec_files
 #
 
+
+def get_absolute_path(path: CT.Str): #(
+    return os.path.abspath(path)
+#)
+
+def ignore_redundant_subdirs(dirs: CT.Iter[CT.Str]):
+    """ If a dir D_1 is a descendant of a dir D_2, don't include D_1 as
+        it will be included with recursive search of D_2. 
+        WARNING: If a given path is a file, it will also be ignored.
+    """
+# (
+    dirs_tpl = tuple(dirs)
+
+    abs_paths = list(map(get_absolute_path, filter(os.path.isdir, dirs_tpl)))
+
+    if len(abs_paths) < 1:
+        # (
+        logging.error(
+            f"Can't get directory paths from given dirs: {str(dirs_tpl)}")
+
+        raise Exception(
+            "Given paths are not directories. Check LOG_ file for details.")
+    # )
+
+    abs_paths.sort()
+
+    prev = abs_paths[0]
+
+    essential_dirs = []
+
+    for ix in range(1, len(abs_paths)):
+        # (
+        current = abs_paths[ix]
+
+        if current.startswith(prev):  # Current is a descendant, ignore.
+            # (
+            continue
+        # )
+        else:
+            # (
+            essential_dirs.append(prev)
+            prev = current
+        # )
+    # )
+    essential_dirs.append(prev)
+
+    return essential_dirs
+# )
 
 def get_fpaths_from_path_iter(paths_iter: List[str]):
     if type(paths_iter) != list:

@@ -23,7 +23,9 @@
 from typing import Callable
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
 
-from typing import Iterable as Iter_t
+from typing import Iterable as Iter
+Iter_t = Iter
+
 from typing import Sequence
 
 from typing import Any
@@ -39,6 +41,7 @@ from typing import TypeVar
 
 # from typing import TypeAlias  # "from typing_extensions" in Python 3.9 and earlier
 
+Str = str
 
 LocationIndices_t = Set[int]
 LocationGroups_t = Iter_t[LocationIndices_t]

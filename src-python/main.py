@@ -49,7 +49,9 @@ import grouper_funs as GRPR
 #from memory_profiler import profile
 
 #@profile
-def main_4(out_fpath, IN_PATHS: List[str], SMALLEST_FILE_SIZE):
+def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
+    IN_PATHS = UT.ignore_redundant_subdirs(IN_DIRS)
+    
     string_seq: List = []
     
     string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
@@ -230,26 +232,6 @@ def trials(trial_count: int, search_paths: List[str], SMALLEST_FILE_SIZE: int):
         
         main_4(OUTFILE_PATH, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FILE_SIZE)
     #
-
-    """
-    350871 items, totalling 759,9 GiB (815.983.211.147 bytes) = ext-disk,NOT SAM
-    """
-
-    """
-    At least 1 byte size filter.
-    Groupers=size,512-hash,8192-hash
-    ELAPSED: 56.87620095499733 seconds. 
-     17354 files.
-     ~300 files/second
-    """
-
-    """
-    At least 1 byte size filter.
-    Groupers=size,512-hash,8192-hash 
-     ELAPSED: 115.64341640401108 seconds. 
-     29288 
-     ~250 files/second
-    """
 #
 
 def check_existence_paths(paths: list):  #(
@@ -297,46 +279,3 @@ if __name__ == "__main__":
     trials(1, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FSIZE) # 1 == Just to find local duplicates.
 #
 
-
-""" if __
-
-    _search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
-        , "/media/genel/Bare-Data/Documents/" \
-        , "/media/genel/Bare-Data/HxD/" \
-        , "/media/genel/Bare-Data/Program Files/"]
-    #
-    
-    _search_paths_WIN10 = ["D:\ALL BOOKS-PAPERS" \
-        , "D:\Documents" \
-        , "D:\HxD" \
-        , "D:\Program Files"]
-    #
-    
-    search_paths = ["/home/genel/"] # or "D:/"
-    # trials(3, search_paths) # for performance measurement of cold/hot data.
-    
-    
-    _search_paths = [ \
-        "/media/genel/SAMSUNG/NOT SAMS/BCK~_2023-01-18T11_/" \
-        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~_2023-02-20T13_/" \
-        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~HP~_2022-05-06_/" \
-        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~Mint~_2022-12-17_/" \
-        ,"/media/genel/SAMSUNG/NOT SAMS/BCK~Sandisk-32GB~_2023-02-20_/" \
-    ]
-
-"""
-
-"""
-_search_paths_MINT = ["/media/genel/Bare-Data/ALL BOOKS-PAPERS/" \
-, "/media/genel/Bare-Data/Documents/" \
-, "/media/genel/Bare-Data/HxD/" \
-, "/media/genel/Bare-Data/Program Files/"]
-"""
-
-"""
-_search_paths = ["/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
-, "/media/genel/SAMSUNG/NOT SAMS/Anime-Cartoon-Manga/" \
-, "/media/genel/SAMSUNG/NOT SAMS/Aile fotolar, videolar/" \
-, "/media/genel/SAMSUNG/NOT SAMS/Aile family/"]
-# search_paths_MINT = "/media/genel/SAMSUNG/NOT SAMS/Alltxt files/"
-"""
