@@ -1,3 +1,3 @@
-/home/genel/DATA/GIT/
-/home/genel/App/
-/home/
+/home/genel/
+/home/genel/DATA
+/home/genel/App

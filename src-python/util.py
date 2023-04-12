@@ -88,11 +88,8 @@ def ignore_redundant_subdirs(dirs: CT.Iter[CT.Str]):
 
     if len(abs_paths) < 1:
         # (
-        logging.error(
-            f"Can't get directory paths from given dirs: {str(dirs_tpl)}")
-
         raise Exception(
-            "Given paths are not directories. Check LOG_ file for details.")
+            f"Can't get directory paths from given dirs (are they valid directories?): {str(dirs_tpl)}")
     # )
 
     abs_paths.sort()

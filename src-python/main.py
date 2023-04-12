@@ -3,7 +3,7 @@
     armaganymmt-prj-1_name processes files from different kinds of
     locations to find duplicate files.>
     
-    Copyright (C) <2021-2023>  <Armağan Salman> <gmail,protonmail: armagansalman>
+    Copyright (C) <2021-2023>  <Armağan Salman> <gmail: armagansalman>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -239,7 +239,7 @@ def check_existence_paths(paths: list):  #(
     
     for idx, pt in enumerate(paths):  #(
         if not os.path.exists(pt):
-            raise Exception(f"Path doesn't exist.\nPath index: {idx}\nPaths:{paths}\n")
+            raise Exception(f"Path doesn't exist.\nPath index (starts from 0): {idx}\nPaths:{paths}\n")
     #)
 #)
 
