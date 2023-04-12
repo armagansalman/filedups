@@ -145,7 +145,7 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
     """
     
     idx_grp = 0
-    for i, grp in enumerate(found_groups):
+    for i, grp in enumerate(found_groups):  #(
         
         grp = list(grp)
         if len(grp) < 2:
@@ -161,14 +161,14 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
         
         # TODO(Armagan): Tidy up this mess of a function.
         
-        SKIP_SIZE = 100
+        SKIP_SIZE = 100  # Don't show files smaller than this KB of size.
         
         if fsize < SKIP_SIZE: # skip if not at least SKIP_SIZE KB
             continue
         
         string_seq.append('~\n')
         
-        for loc_idx in grp:
+        for loc_idx in grp:  #(
             # TODO(armagan): This is an ugly way and code. Use PyConst or
             # immutable data structures instead of class/objects.
             # ??https://github.com/tobgu/pyrsistent
@@ -177,17 +177,11 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
             
             string_seq.extend( [f"T.1 ; G: {idx_grp} ; S: {fsize:1.2f} (KB) ; P: {loc}"])
             string_seq.append('\n')
-            #string_seq.extend( [">>> File name:", UT.get_path_basename(loc)])
-            #string_seq.append('\n')
-            #string_seq.append('\n')
-        #
-        #string_seq.append("----------- [Group {}] END -------".format(idx_grp))
-        #string_seq.append('\n')
-        #string_seq.append('\n')
+        #)
         
         idx_grp += 1
-    #
-    """"""
+    #)
+    
     TM_end = time.perf_counter()
 
     #print("ELAPSED:",TM_end - TM_beg)
@@ -244,6 +238,30 @@ def check_existence_paths(paths: list):  #(
 #)
 
 
+def main(args):  #(
+    in_fname = args["in-txt-filepath"]
+    #print(f"Input text file name: {in_fname}")
+    
+    
+    #print("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~")
+    in_txt_file_lines = UT.read_file_text(in_fname)
+    
+    search_paths_iter = map(lambda p: p.strip() , in_txt_file_lines)  # Remove prefix and suffix blank characters.
+    search_paths = list(search_paths_iter)
+    
+    check_existence_paths(search_paths)
+    
+    print("<[ INFO ]> Finding duplicates...")
+    
+    SMALLEST_FSIZE = 32 * CONST.xKB
+    
+    NOW = UT.get_now_str()
+    OUTFILE_PATH = "filedups ({}) (at least ({:2.2f} bytes)).txt".format(NOW, SMALLEST_FSIZE/1024)
+    
+    return main_4(OUTFILE_PATH, search_paths, SMALLEST_FSIZE)
+#)
+
+
 if __name__ == "__main__":
     # TODO(Armağan): Restructure and clean the code.
     # TODO(Armağan): Given args for directories OR do gui as explained below:
@@ -261,21 +279,9 @@ if __name__ == "__main__":
     
     assert(first_arg.endswith(".txt"))
     
-    in_fname = first_arg
-    #print(f"Input text file name: {in_fname}")
+    args = dict()
+    args["in-txt-filepath"] = first_arg
     
-    
-    #print("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~")
-    in_txt_file_lines = UT.read_file_text(in_fname)
-    
-    search_paths_iter = map(lambda p: p.strip() , in_txt_file_lines)  # Remove prefix and suffix blank characters.
-    search_paths = list(search_paths_iter)
-    
-    check_existence_paths(search_paths)
-    
-    print("<[ INFO ]> Finding duplicates...")
-    
-    SMALLEST_FSIZE = 32 * CONST.xKB
-    trials(1, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FSIZE) # 1 == Just to find local duplicates.
+    main(args)
 #
 

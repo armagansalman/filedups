@@ -20,7 +20,7 @@
 """
 
 
-import main
+import main as M
 import constants as CONST
 import util as UT
 
@@ -40,20 +40,10 @@ if __name__ == "__main__":
     
     first_arg: str = arg_list[0]  # .txt file which holds a dir path on each line.
     
-    in_fname = first_arg
-    #print(f"Input text file name: {in_fname}")
+    assert(first_arg.endswith(".txt"))
     
+    args = dict()
+    args["in-txt-filepath"] = first_arg
     
-    #print("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~")
-    in_txt_file_lines = UT.read_file_text(in_fname)
-    
-    search_paths_iter = map(lambda p: p.strip() , in_txt_file_lines)  # Remove prefix and suffix blank characters.
-    search_paths = list(search_paths_iter)
-    
-    main.check_existence_paths(search_paths)
-    
-    print("<[ INFO ]> Finding duplicates...")
-    
-    SMALLEST_FSIZE = 32 * CONST.xKB
-    main.trials(1, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FSIZE) # 1 == Just to find local duplicates.
+    M.main(args)
 #
