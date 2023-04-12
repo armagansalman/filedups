@@ -73,13 +73,16 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
     # string_seq.extend( ["HASH_SIZE(bytes)=", HASH_SIZE] )
     # string_seq.append('\n')
     
-    string_seq.extend( ["SMALLEST_FILE_SIZE(bytes)=", SMALLEST_FILE_SIZE] )
-    string_seq.append('\n')
-
-    
     fls_unfiltered: Set[str] = UT.get_fpaths_from_path_iter(IN_PATHS)
     
+    string_seq.extend( ["Total number of unfiltered files to search=", len(fls_unfiltered)] )
+    string_seq.append('\n')
+    
+    
     SMALLEST_SIZE: int = SMALLEST_FILE_SIZE
+        
+    string_seq.extend( ["SMALLEST_FILE_SIZE(bytes)=", SMALLEST_FILE_SIZE] )
+    string_seq.append('\n')
     
     def flt_size(path: str):
         #
