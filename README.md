@@ -3,7 +3,7 @@
 <br>Doesn't provide 100% accuracy. Reported files in a group might not be exactly the same.
 
 ## HOW TO USE
-Go to src/filedups.
+Go to src/filedups in terminal.
 <br>Put full paths of directories you want to search in in-dirs.txt file on separate lines.
 <br>Then run main.py:
 <br>For Linux:
