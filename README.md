@@ -1,4 +1,4 @@
-# FIND FILE DUPLICATES
+# filedups
 <br>Given a sequence of paths (full directory paths), finds and groups duplicate files recursively.
 <br>Doesn't provide 100% accuracy. Reported files in a group might not be exactly the same.
 
