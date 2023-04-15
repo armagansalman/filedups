@@ -40,6 +40,7 @@ import time
 from common_types import *
 import constants as CONST
 from classes import *
+import argparser_custom as Argp
 import util as UT
 import grouper_funs as GRPR
 
@@ -242,11 +243,16 @@ def check_existence_paths(paths: list):  #(
 
 
 def main(args):  #(
+    DEFAULT_MIN_FSIZE = 32 * CONST.xKB
+    
+    SMALLEST_FSIZE = DEFAULT_MIN_FSIZE
+    
+    msize = args["min_file_size"]
+    if msize != None:
+        SMALLEST_FSIZE = int(msize)
+    
     in_fname = args["in-txt-filepath"]
-    #print(f"Input text file name: {in_fname}")
     
-    
-    #print("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~")
     in_txt_file_lines = UT.read_file_text(in_fname)
     
     search_paths_iter = map(lambda p: p.strip() , in_txt_file_lines)  # Remove prefix and suffix blank characters.
@@ -255,8 +261,6 @@ def main(args):  #(
     check_existence_paths(search_paths)
     
     print("<[ INFO ]> Finding duplicates...")
-    
-    SMALLEST_FSIZE = 32 * CONST.xKB
     
     NOW = UT.get_now_str()
     OUTFILE_PATH = "filedups ({}) (at least ({:2.2f} bytes)).txt".format(NOW, SMALLEST_FSIZE/1024)
@@ -276,14 +280,12 @@ if __name__ == "__main__":
         raise Exception("No input file given as argument. Aborted.")
     #)
     
-    arg_list = sys.argv[1:]
-    
-    first_arg: str = arg_list[0]  # .txt file which holds a dir path on each line.
-    
-    assert(first_arg.endswith(".txt"))
+    parser_version = 0
+    parsed_args = Argp.create_parser(sys.argv, parser_version)
     
     args = dict()
-    args["in-txt-filepath"] = first_arg
+    args["in-txt-filepath"] = parsed_args.filename
+    args["min_file_size"] = parsed_args.min_file_size
     
     main(args)
 #
