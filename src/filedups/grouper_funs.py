@@ -24,8 +24,7 @@ from common_types import *
 from classes import *
 
 
-def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t, \
-                    PERC: MatchPercentage_t) -> LocationGroups_t:
+def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t) -> LocationGroups_t:
     
     size_groups: Dict[int, Set[int]] = dict()
     for IDX in LOCS:
@@ -56,8 +55,7 @@ def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t, \
 
 def sha512_first_X_bytes(X: int) -> GroupFunc_t:
     #
-    def grouper(FIDX: FileIndexer, LOCS: LocationIndices_t, \
-                    PERC: MatchPercentage_t) -> LocationGroups_t:
+    def grouper(FIDX: FileIndexer, LOCS: LocationIndices_t) -> LocationGroups_t:
         #
         hash_groups: Dict[int, Set[int]] = dict()
         

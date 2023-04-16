@@ -46,6 +46,22 @@ import grouper_funs as GRPR
 
 
 
+def flt_size(path: str):
+    #
+    try:
+        sz: MaybeInt = UT.get_file_size_in_bytes(path)
+        if is_nothing(sz):
+            return False
+        #
+        if get_data(sz) >= SMALLEST_SIZE:
+            return True
+        #
+        return False
+    #
+    except: # TODO(armagan): Report/except when exception occurs.
+        return False
+#
+
 
 #from memory_profiler import profile
 
@@ -85,22 +101,6 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
     string_seq.extend( ["SMALLEST_FILE_SIZE(bytes)=", SMALLEST_FILE_SIZE] )
     string_seq.append('\n')
     
-    def flt_size(path: str):
-        #
-        try:
-            sz: MaybeInt = UT.get_file_size_in_bytes(path)
-            if is_nothing(sz):
-                return False
-            #
-            if get_data(sz) >= SMALLEST_SIZE:
-                return True
-            #
-            return False
-        #
-        except: # TODO(armagan): Report/except when exception occurs.
-            return False
-    #
-    
     string_seq.extend( ["Using size filter. Size(bytes)=", SMALLEST_SIZE] )
     string_seq.append('\n')
     
@@ -117,7 +117,7 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
 
     FINDX = FileIndexer([fsinfo])
     
-    FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
+    FINDER: DuplicateFinder = DuplicateFinder(FINDX)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
     hs1 = 64 * CONST.xBYTE

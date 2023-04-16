@@ -169,8 +169,7 @@ class FileIndexer:
 
 
 # Some type definitions:
-GroupFunc_t = Callable[[FileIndexer, LocationIndices_t, \
-                        MatchPercentage_t], LocationGroups_t]
+GroupFunc_t = Callable[[FileIndexer, LocationIndices_t], LocationGroups_t]
 
 
 class DuplicateFinder:
