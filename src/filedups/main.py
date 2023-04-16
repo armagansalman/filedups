@@ -264,7 +264,7 @@ def main(args):  #(
     print("<[ INFO ]> Finding duplicates...")
     
     NOW = UT.get_now_str()
-    OUTFILE_PATH = "filedups ({}) (at least ({:2.2f} bytes)).txt".format(NOW, SMALLEST_FSIZE/1024)
+    OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
     
     return main_4(OUTFILE_PATH, search_paths, SMALLEST_FSIZE)
 #)
