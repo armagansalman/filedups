@@ -100,7 +100,7 @@ class FilesInfo:
     , size_getter: SizeFunc):
     #   
         self.locations: List[Location]  = list(set(locations))
-        # set to remove duplicate locations.
+        # set data type to remove duplicate locations.
         # Ensure it's subscriptable.
         
         self.reader_func = reader_func
@@ -169,7 +169,6 @@ class FileIndexer:
 
 
 # Some type definitions:
-MatchPercentage_t = float
 GroupFunc_t = Callable[[FileIndexer, LocationIndices_t, \
                         MatchPercentage_t], LocationGroups_t]
 
@@ -177,10 +176,8 @@ GroupFunc_t = Callable[[FileIndexer, LocationIndices_t, \
 class DuplicateFinder:
     FIDX = None  # File Indexer
 	
-    def __init__(self, FILE_INDEXER: FileIndexer, \
-                SIMILARITY_PERCENTAGE: float):
+    def __init__(self, FILE_INDEXER: FileIndexer):
         self.FIDX = FILE_INDEXER
-        self.SIMILARITY = SIMILARITY_PERCENTAGE
     #
     
     

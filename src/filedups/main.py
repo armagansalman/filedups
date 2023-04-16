@@ -117,7 +117,6 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
 
     FINDX = FileIndexer([fsinfo])
     
-    # TODO(armagan): Use DuplicateFinder class and group function(s).
     FINDER: DuplicateFinder = DuplicateFinder(FINDX, 0.5)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
