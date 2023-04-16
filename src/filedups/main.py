@@ -46,21 +46,7 @@ import grouper_funs as GRPR
 
 
 
-def flt_size(path: str):
-    #
-    try:
-        sz: MaybeInt = UT.get_file_size_in_bytes(path)
-        if is_nothing(sz):
-            return False
-        #
-        if get_data(sz) >= SMALLEST_SIZE:
-            return True
-        #
-        return False
-    #
-    except: # TODO(armagan): Report/except when exception occurs.
-        return False
-#
+
 
 
 #from memory_profiler import profile
@@ -103,6 +89,22 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
     
     string_seq.extend( ["Using size filter. Size(bytes)=", SMALLEST_SIZE] )
     string_seq.append('\n')
+    
+    def flt_size(path: str):
+    #
+        try:
+            sz: MaybeInt = UT.get_file_size_in_bytes(path)
+            if is_nothing(sz):
+                return False
+            #
+            if get_data(sz) >= SMALLEST_SIZE:
+                return True
+            #
+            return False
+        #
+        except: # TODO(armagan): Report/except when exception occurs.
+            return False
+    #
     
     locations: Set[str] = set(filter(flt_size, fls_unfiltered))
     

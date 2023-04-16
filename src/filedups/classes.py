@@ -188,8 +188,7 @@ class DuplicateFinder:
     def apply_one_grouper(self, LOCS: LocationIndices_t, \
                         FUNC: GroupFunc_t) -> LocationGroups_t:
         #
-        locs: LocationGroups_t = FUNC(self.FIDX, LOCS, \
-                                            self.SIMILARITY)
+        locs: LocationGroups_t = FUNC(self.FIDX, LOCS)
         return locs
     #
     
