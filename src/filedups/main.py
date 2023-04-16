@@ -52,7 +52,7 @@ import grouper_funs as GRPR
 #from memory_profiler import profile
 
 #@profile
-def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
+def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE):
     IN_PATHS = UT.ignore_redundant_subdirs(IN_DIRS)
     
     string_seq: List = []
@@ -82,9 +82,9 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
     string_seq.append('\n')
     
     
-    SMALLEST_SIZE: int = SMALLEST_FILE_SIZE
+    SMALLEST_SIZE: int = SMALLEST_FILE_SIZE_BYTE
         
-    string_seq.extend( ["SMALLEST_FILE_SIZE(bytes)=", SMALLEST_FILE_SIZE] )
+    string_seq.extend( ["SMALLEST_FILE_SIZE_BYTE(bytes)=", SMALLEST_FILE_SIZE_BYTE] )
     string_seq.append('\n')
     
     string_seq.extend( ["Using size filter. Size(bytes)=", SMALLEST_SIZE] )
@@ -162,13 +162,14 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
         loc_idx = grp[0]
         loc = FINDER.FIDX.get_location(loc_idx)
         fsize_tpl = FINDER.FIDX.get_size_func(loc_idx)(loc)
-        fsize = fsize_tpl[1] / 1024  # Turns from BYTE -> KB
+        fsize_byte = fsize_tpl[1]
+        fsize_kb = fsize_byte / 1024  # Turns from BYTE -> KB
         
         # TODO(Armagan): Tidy up this mess of a function.
         
-        SKIP_SIZE = 100  # Don't show files smaller than this KB of size.
+        SKIP_SIZE_BYTE = SMALLEST_FILE_SIZE_BYTE  # Don't show files smaller than this KB of size.
         
-        if fsize < SKIP_SIZE: # skip if not at least SKIP_SIZE KB
+        if fsize_byte < SKIP_SIZE_BYTE: # skip if not at least SKIP_SIZE KB
             continue
         
         string_seq.append('~\n')
@@ -180,7 +181,7 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
             
             loc = FINDER.FIDX.get_location(loc_idx)
             
-            string_seq.extend( [f"T.1 ; G: {idx_grp} ; S: {fsize:1.2f} (KB) ; P: {loc}"])
+            string_seq.extend( [f"T.1 ; G: {idx_grp} ; S: {fsize_kb:1.2f} (KB) ; P: {loc}"])
             string_seq.append('\n')
         #)
         
@@ -218,18 +219,18 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE):
 #
 
 
-def trials(trial_count: int, search_paths: List[str], SMALLEST_FILE_SIZE: int):
+def trials(trial_count: int, search_paths: List[str], SMALLEST_FILE_SIZE_BYTE: int):
     NOW = UT.get_now_str()
 
     for i in range(trial_count):
         
-        OUTFILE_PATH = "filedups ({}) (at least ({:2.2f} bytes)).txt".format(NOW, SMALLEST_FILE_SIZE/1024)
+        OUTFILE_PATH = "filedups ({}) (at least ({:2.2f} bytes)).txt".format(NOW, SMALLEST_FILE_SIZE_BYTE/1024)
         
         # TODO(armagan): Separate apply func. and write to file.
         # TODO(armagan): Create LocalFileFinder
         # TODO(armagan): Combine 1 byte size filter and size grouper for performance.
         
-        main_4(OUTFILE_PATH, search_paths, SMALLEST_FILE_SIZE = SMALLEST_FILE_SIZE)
+        main_4(OUTFILE_PATH, search_paths, SMALLEST_FILE_SIZE_BYTE = SMALLEST_FILE_SIZE_BYTE)
     #
 #
 
@@ -244,7 +245,7 @@ def check_existence_paths(paths: list):  #(
 
 
 def main(args):  #(
-    DEFAULT_MIN_FSIZE = 32 * CONST.xKB
+    DEFAULT_MIN_FSIZE = 100 * CONST.xKB
     
     SMALLEST_FSIZE = DEFAULT_MIN_FSIZE
     

@@ -5,7 +5,7 @@
 ## HOW TO USE
 Go to src/filedups in terminal.
 <br>Put full paths of directories you want to search in in-dirs.txt file on separate lines.
-<br>Option (M is the number of bytes) (default value is 32768): 
+<br>Option (M is the number of bytes) (default value is 102400): 
 <br>--min-file-size M
 
 <br>Then run main.py:
