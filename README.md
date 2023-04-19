@@ -11,6 +11,8 @@ Go to src/filedups in terminal.
 <br>Then run main.py:
 <br>For Linux:
 <br>**python3 main.py in-dirs.txt**
+
+<br><br>200 KB minimum file size:
 <br>**python3 main.py in-dirs.txt --min-file-size 204800**
 
 <br>For Windows:
