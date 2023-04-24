@@ -202,6 +202,27 @@ def local_file_reader_range(file_path: str, start_offset: int, \
 #
 
 
+def filter_by_size(paths: list[str], min_limit = None, max_limit = None):
+#
+    included_paths = []
+    for pt in paths:  #(
+        try:  # TODO(Armağan): Don't hide errors.
+            msz: MaybeInt = get_file_size_in_bytes(pt)
+            
+            sz = get_data(msz)
+            
+            min_cond = (min_limit != None and sz >= min_limit) or min_limit == None
+            max_cond = (max_limit != None and sz <= max_limit) or max_limit == None
+            
+            if min_cond and max_cond:
+                included_paths.append(pt)
+            #
+        except: # TODO(armagan): Report/except when exception occurs.
+            continue
+    #)
+    return included_paths
+#
+
 def sha512_bytes(data: bytes):
 	hs = hashlib.sha512()
 	hs.update(data)

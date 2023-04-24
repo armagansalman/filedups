@@ -32,6 +32,7 @@ def argparser_ver_0():  #(
     #
     parser.add_argument('filename', help = ".txt file containing full directory paths on each line.") # positional argument
     parser.add_argument('--min-file-size', help = "Minimum file size in bytes.")      # option that takes a value
+    parser.add_argument('--max-file-size', help = "Maximum file size in bytes.")      # option that takes a value
     
     return parser
 #)

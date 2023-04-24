@@ -52,7 +52,7 @@ import grouper_funs as GRPR
 #from memory_profiler import profile
 
 #@profile
-def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE):
+def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMIT = None):
     IN_PATHS = UT.ignore_redundant_subdirs(IN_DIRS)
     
     string_seq: List = []
@@ -90,23 +90,8 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE):
     string_seq.extend( ["Using size filter. Size(bytes)=", SMALLEST_SIZE] )
     string_seq.append('\n')
     
-    def flt_size(path: str):
-    #
-        try:
-            sz: MaybeInt = UT.get_file_size_in_bytes(path)
-            if is_nothing(sz):
-                return False
-            #
-            if get_data(sz) >= SMALLEST_SIZE:
-                return True
-            #
-            return False
-        #
-        except: # TODO(armagan): Report/except when exception occurs.
-            return False
-    #
-    
-    locations: Set[str] = set(filter(flt_size, fls_unfiltered))
+    locations: Set[str] = set(UT.filter_by_size(fls_unfiltered, \
+                            SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMIT))
     
     # fls: Set[str] = UT.get_nonzero_length_files(IN_PATHS)
     
@@ -123,7 +108,7 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE):
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
     hs1 = 64 * CONST.xBYTE
-    hs2 = 512 * CONST.xBYTE
+    hs2 = 1024 * CONST.xBYTE
     #hs2 = 1 * CONST.xKB
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
@@ -252,7 +237,13 @@ def main(args):  #(
     msize = args["min_file_size"]
     if msize != None:
         SMALLEST_FSIZE = int(msize)
+    #
     
+    MAX_FSIZE = args["max_file_size"]
+    if MAX_FSIZE != None:
+        MAX_FSIZE = int(MAX_FSIZE)
+    #    
+
     in_fname = args["in-txt-filepath"]
     
     in_txt_file_lines = UT.read_file_text(in_fname)
@@ -267,7 +258,7 @@ def main(args):  #(
     NOW = UT.get_now_str()
     OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
     
-    return main_4(OUTFILE_PATH, search_paths, SMALLEST_FSIZE)
+    return main_4(OUTFILE_PATH, search_paths, SMALLEST_FSIZE, MAX_FSIZE)
 #)
 
 
@@ -288,6 +279,7 @@ if __name__ == "__main__":
     args = dict()
     args["in-txt-filepath"] = parsed_args.filename
     args["min_file_size"] = parsed_args.min_file_size
+    args["max_file_size"] = parsed_args.max_file_size
     
     main(args)
 #
