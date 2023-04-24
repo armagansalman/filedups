@@ -230,7 +230,7 @@ def check_existence_paths(paths: list):  #(
 
 
 def main(args):  #(
-    DEFAULT_MIN_FSIZE = 100 * CONST.xKB
+    DEFAULT_MIN_FSIZE = 1000 * CONST.xKB
     
     SMALLEST_FSIZE = DEFAULT_MIN_FSIZE
     
