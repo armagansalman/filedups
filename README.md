@@ -5,7 +5,7 @@
 ## HOW TO USE
 Go to src/filedups in terminal.
 <br>Put full paths of directories you want to search in in-dirs.txt file on separate lines.
-<br>Option (M is the number of bytes) (default value is 102400): 
+<br>Option (M is the number of bytes) (default value is 1024000 (1000 KB)): 
 <br>--min-file-size M
 
 <br>Then run main.py:
@@ -14,6 +14,9 @@ Go to src/filedups in terminal.
 
 <br><br>200 KB minimum file size:
 <br>**python3 main.py in-dirs.txt --min-file-size 204800**
+
+<br><br>200 KB minimum, 2000 KB maximum file size:
+<br>**python3 main.py in-dirs.txt --min-file-size 204800 --max-file-size 2048000**
 
 <br>For Windows:
 <br>**py main.py in-dirs.txt**
