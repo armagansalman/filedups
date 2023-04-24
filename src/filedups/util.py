@@ -167,7 +167,24 @@ def get_nonzero_length_files(paths_arg: List[str]):
 #
 
 
-def local_file_reader(file_path: str, start_offset: int, \
+def local_file_reader_first_bytes(file_path: str, first_bytes_count: int) \
+        -> Tuple[bool, bytes]:
+    # Includes bytes at start_offset and end_offset
+    try:
+        data: bytes = b'0'
+        
+        #TODO(armagan): Read by chunks.
+        with open(file_path, "rb") as in_fobj:
+            data = in_fobj.read(first_bytes_count)
+        #
+        
+        return make_some(data)
+    except: # TODO(armagan): Report/except when None.
+        return make_nothing()
+#
+
+
+def local_file_reader_range(file_path: str, start_offset: int, \
         end_offset: int) -> Tuple[bool, bytes]:
     # Includes bytes at start_offset and end_offset
     try:

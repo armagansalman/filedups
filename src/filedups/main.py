@@ -114,7 +114,7 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE):
     string_seq.append('\n')
     
 
-    fsinfo = FilesInfo(locations, UT.local_file_reader, \
+    fsinfo = FilesInfo(locations, UT.local_file_reader_first_bytes, \
                         UT.get_local_file_size)
 
     FINDX = FileIndexer([fsinfo])
@@ -123,7 +123,7 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE):
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
     hs1 = 64 * CONST.xBYTE
-    hs2 = 1024 * CONST.xBYTE
+    hs2 = 512 * CONST.xBYTE
     #hs2 = 1 * CONST.xKB
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \

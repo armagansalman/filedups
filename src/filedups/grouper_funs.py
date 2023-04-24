@@ -62,7 +62,7 @@ def sha512_first_X_bytes(X: int) -> GroupFunc_t:
         for IDX in LOCS:
             LOC = FIDX.get_location(IDX)
             read_func = FIDX.get_reader(IDX)
-            FIRST_X_BYTES = read_func(LOC, 0, X-1) # end byte idx = X-1
+            FIRST_X_BYTES = read_func(LOC, X) # end byte idx = X-1
             
             # TODO(armagan): Report/except when FIRST_X_BYTES == None.
             if is_nothing(FIRST_X_BYTES):
