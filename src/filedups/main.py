@@ -35,6 +35,7 @@
 
 
 import time
+import logging
 
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
 from common_types import *
@@ -230,6 +231,8 @@ def check_existence_paths(paths: list):  #(
 
 
 def main(args):  #(
+    logging.basicConfig(filename=f"filedups {UT.get_now_str()}.log", encoding='utf-8', level=logging.DEBUG)
+    
     DEFAULT_MIN_FSIZE = 100 * CONST.xKB
     
     SMALLEST_FSIZE = DEFAULT_MIN_FSIZE
