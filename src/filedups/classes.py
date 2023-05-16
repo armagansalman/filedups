@@ -155,14 +155,14 @@ class FileIndexer:
     #
     
     
-    def get_max_idx(self) -> int:
+    def get_data_len(self) -> int:
         # Total number of locations minus 1.
-        return len(self.data)-1
+        return len(self.data)
     #
     
     
     def get_all_indices(self) -> List[int]:
-        return [x for x in range(self.get_max_idx()+1)]
+        return [x for x in range(self.get_data_len())]
     #
     
 #

@@ -122,11 +122,11 @@ def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None)
     string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(hs1,hs2)] )
     #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
     string_seq.append('\n')
+    """
     
     string_seq.extend( ["T.1 ; == ; Group id ; File size ; File Path"] )
     #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
     string_seq.append('\n')
-    """
     
     TM_beg = time.perf_counter()
     
