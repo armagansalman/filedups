@@ -72,11 +72,6 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     
     TM_beg = time.perf_counter()
     
-    #print("HASH_BYTES=", HASH_BYTES)
-
-    # string_seq.extend( ["HASH_SIZE(bytes)=", HASH_SIZE] )
-    # string_seq.append('\n')
-    
     fls_unfiltered: Set[str] = UT.get_fpaths_from_path_iter(IN_PATHS)
     
     string_seq.extend( ["Total number of unfiltered files to search=", len(fls_unfiltered)] )
@@ -94,7 +89,6 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     locations: Set[str] = set(UT.filter_by_size(fls_unfiltered, \
                             SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMIT))
     
-    # fls: Set[str] = UT.get_nonzero_length_files(IN_PATHS)
     
     string_seq.extend( ["Total number of filtered files to search=", len(locations)] )
     string_seq.append('\n')
@@ -109,8 +103,7 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
     hs1 = 64 * CONST.xBYTE
-    hs2 = 1024 * CONST.xBYTE
-    #hs2 = 1 * CONST.xKB
+    hs2 = 1 * CONST.xKB
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
      , GRPR.sha512_first_X_bytes(X=hs1) \
@@ -139,12 +132,10 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     for i, grp in enumerate(found_groups):  #(
         
         grp = list(grp)
-        if len(grp) < 2:
+        if len(grp) < 2:  #(
             continue # Skip unique files.
-        
-        #string_seq.append("+++++++++++ [Group {}] start +++++++".format(i))
-        #string_seq.append('\n')
-        
+        #)
+                
         loc_idx = grp[0]
         loc = FINDER.FIDX.get_location(loc_idx)
         fsize_tpl = FINDER.FIDX.get_size_func(loc_idx)(loc)
@@ -176,8 +167,6 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     
     TM_end = time.perf_counter()
 
-    #print("ELAPSED:",TM_end - TM_beg)
-    
     string_seq.extend( ["End datetime ISO-8601 = {}".format(UT.get_now_str())] )
     string_seq.append('\n')
     
@@ -186,14 +175,9 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     
     indices: List[int] = FINDX.get_all_indices()
     
-    #print(len(indices))
     string_seq.extend( [f"Total file count for grouping was: {len(indices)}"] )
     string_seq.append('\n')
-    
-    #print(indices[:7])
-    #string_seq.extend([indices[:7]])
-    
-    #print("***************************************")
+
     string_seq.extend( ["**********************************************************************"] )
     string_seq.append('\n')
     
@@ -231,7 +215,9 @@ def check_existence_paths(paths: list):  #(
 
 
 def main(args):  #(
-    logging.basicConfig(filename=f"filedups {UT.get_now_str()}.log", encoding='utf-8', level=logging.DEBUG)
+    NOW = UT.get_now_str()
+    
+    logging.basicConfig(filename=f"filedups ({NOW}).log", encoding='utf-8', level=logging.DEBUG)
     
     DEFAULT_MIN_FSIZE = 100 * CONST.xKB
     
@@ -258,7 +244,6 @@ def main(args):  #(
     
     print("<[ INFO ]> Finding duplicates...")
     
-    NOW = UT.get_now_str()
     OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
     
     return main_4(OUTFILE_PATH, search_paths, SMALLEST_FSIZE, MAX_FSIZE)
