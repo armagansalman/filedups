@@ -114,19 +114,26 @@ FileTriple = Tuple[Location, ReaderFunc, SizeFunc]
 
 class FileIndexer:
     data = None
+    fns_file_reader: List[Callable] = None
+    fns_file_size: List[Callable] = None
     
     def __init__(self, files_info_iter: Iter_t[FilesInfo]):
-        self.data: List[FileTriple] = list()
-        # data = [["path1", reader, size_getter], ["path2", ...,...]]
+        self.data: List[str] = list()
+        self.fns_file_reader = list()
+        self.fns_file_size = list()
+        
+        finfo_idx = 0
+
         for files_info in files_info_iter:
-            reader: ReaderFunc = files_info.reader_func
-            size_fun: SizeFunc = files_info.size_getter
+            self.fns_file_reader.append(files_info.reader_func)
+            self.fns_file_size.append(files_info.size_getter)
             
             for loc in files_info.locations:
-                info: FileTriple = (loc, reader, size_fun)
+                info: FileTriple = (loc, finfo_idx)
                     
                 self.data.append(info)
             #
+            finfo_idx += 1
         #
     #
     
@@ -145,13 +152,13 @@ class FileIndexer:
     
     def get_reader(self, idx: int) -> ReaderFunc:
         info: FileTriple = self.get_file_info(idx)
-        return info[1]
+        return self.fns_file_reader[info[1]]
     #
     
     
     def get_size_func(self, idx: int) -> SizeFunc:
         info: FileTriple = self.get_file_info(idx)
-        return info[2]
+        return self.fns_file_size[info[1]]
     #
     
     
