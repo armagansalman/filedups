@@ -29,10 +29,6 @@
 # TODO(armagan): For printing paths, split filename, write filename first.
 # then write its path.
 
-# TODO(armagan): Create hash,set(paths) groups. Traverse them in DFS and
-# repeat the process. Recursively apply the process on every group until
-# either 1 file remains or a condition is met.
-
 
 import time
 import logging
@@ -48,52 +44,17 @@ import grouper_funs as GRPR
 
 
 
-
-
-#from memory_profiler import profile
-
-#@profile
-def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMIT = None):
+def find_duplicate_groups(IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  #(
     IN_PATHS = UT.ignore_redundant_subdirs(IN_DIRS)
-    
-    string_seq: List = []
-    
-    string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
-    string_seq.append('\n')
-    
-    now_str = UT.get_now_str()
-    
-    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
-    string_seq.append('\n')
-    
-    string_seq.append("Paths: \n")
-    string_seq.append( '\n'.join(IN_PATHS) )
-    string_seq.append('\n\n')
-    
-    TM_beg = time.perf_counter()
     
     fls_unfiltered: Set[str] = UT.get_fpaths_from_path_iter(IN_PATHS)
     
-    string_seq.extend( ["Total number of unfiltered files to search=", len(fls_unfiltered)] )
-    string_seq.append('\n')
-    
-    
-    SMALLEST_SIZE: int = SMALLEST_FILE_SIZE_BYTE
-        
-    string_seq.extend( ["SMALLEST_FILE_SIZE_BYTE(bytes)=", SMALLEST_FILE_SIZE_BYTE] )
-    string_seq.append('\n')
-    
-    string_seq.extend( ["Using size filter. Size(bytes)=", SMALLEST_SIZE] )
-    string_seq.append('\n')
+    SMALLEST_SIZE: int = MIN_SIZE_LIMIT
     
     locations: Set[str] = set(UT.filter_by_size(fls_unfiltered, \
-                            SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMIT))
+                            MIN_SIZE_LIMIT, MAX_SIZE_LIMIT))
+    #
     
-    
-    string_seq.extend( ["Total number of filtered files to search=", len(locations)] )
-    string_seq.append('\n')
-    
-
     fsinfo = FilesInfo(locations, UT.local_file_reader_first_bytes, \
                         UT.get_local_file_size)
 
@@ -106,9 +67,57 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     hs2 = 1 * CONST.xKB
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
-     , GRPR.sha512_first_X_bytes(X=hs1) \
-    , GRPR.sha512_first_X_bytes(X=hs2) \
+        , GRPR.sha512_first_X_bytes(X=hs1) \
+        , GRPR.sha512_first_X_bytes(X=hs2) \
     ]
+    
+    
+    found_groups: LocationGroups_t = FINDER.apply_multiple_groupers(\
+                                    all_indices, grouper_funcs)
+    #
+    
+    result = {"groups": found_groups \
+        , "finder": FINDER \
+        , "findx": FINDX 
+    }
+    
+    return result
+#)
+
+
+#from memory_profiler import profile
+
+#@profile
+def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None):    
+    string_seq: List = []
+    
+    string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
+    string_seq.append('\n')
+    
+    now_str = UT.get_now_str()
+    
+    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
+    string_seq.append('\n')
+    
+    
+    """
+    string_seq.append("Paths: \n")
+    string_seq.append( '\n'.join(IN_PATHS) )
+    string_seq.append('\n\n')
+    
+    
+    string_seq.extend( ["Total number of unfiltered files to search=", len(fls_unfiltered)] )
+    string_seq.append('\n')
+    
+    string_seq.extend( ["SMALLEST_FILE_SIZE_BYTE(bytes)=", MIN_SIZE_LIMIT] )
+    string_seq.append('\n')
+    
+    string_seq.extend( ["Using size filter. Size(bytes)=", MIN_SIZE_LIMIT] )
+    string_seq.append('\n')
+    
+    
+    string_seq.extend( ["Total number of filtered files to search=", len(locations)] )
+    string_seq.append('\n')
     
     string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(hs1,hs2)] )
     #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
@@ -117,16 +126,17 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
     string_seq.extend( ["T.1 ; == ; Group id ; File size ; File Path"] )
     #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
     string_seq.append('\n')
-    
-    found_groups: LocationGroups_t = FINDER.apply_multiple_groupers(\
-                                    all_indices, grouper_funcs)
-    
-    
     """
-    size_group: LocationGroups_t = FINDER.apply_one_grouper(all_indices,\
-                                                        GRPR.group_by_size)
-    #
-    """
+    
+    TM_beg = time.perf_counter()
+    
+    result_mapping = find_duplicate_groups(IN_DIRS, MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
+    
+    TM_end_group = time.perf_counter()
+    
+    found_groups = result_mapping["groups"]
+    FINDER = result_mapping["finder"]
+    FINDX = result_mapping["findx"]
     
     idx_grp = 0
     for i, grp in enumerate(found_groups):  #(
@@ -144,9 +154,9 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
         
         # TODO(Armagan): Tidy up this mess of a function.
         
-        SKIP_SIZE_BYTE = SMALLEST_FILE_SIZE_BYTE  # Don't show files smaller than this KB of size.
+        SKIP_SIZE_BYTE = MIN_SIZE_LIMIT  # Don't show files smaller than this KB of size.
         
-        if fsize_byte < SKIP_SIZE_BYTE: # skip if not at least SKIP_SIZE KB
+        if fsize_byte < SKIP_SIZE_BYTE:
             continue
         
         string_seq.append('~\n')
@@ -165,12 +175,16 @@ def main_4(out_fpath, IN_DIRS: List[str], SMALLEST_FILE_SIZE_BYTE, MAX_SIZE_LIMI
         idx_grp += 1
     #)
     
-    TM_end = time.perf_counter()
+    TM_end_str_write = time.perf_counter()
+
+    string_seq.append('~\n')
 
     string_seq.extend( ["End datetime ISO-8601 = {}".format(UT.get_now_str())] )
     string_seq.append('\n')
     
-    string_seq.extend( ["ELAPSED:",TM_end - TM_beg, "seconds."] )
+    string_seq.extend( ["Elapsed Time for Grouping:",TM_end_group - TM_beg, "seconds."] )
+    string_seq.append('\n')
+    string_seq.extend( ["Total Elapsed Time:",TM_end_str_write - TM_beg, "seconds."] )
     string_seq.append('\n')
     
     indices: List[int] = FINDX.get_all_indices()
