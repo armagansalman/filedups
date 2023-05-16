@@ -36,7 +36,7 @@ import logging
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
 from common_types import *
 import constants as CONST
-from classes import *
+from classes import FilesInfo, FileIndexer, DuplicateFinder
 import argparser_custom as Argp
 import util as UT
 import grouper_funs as GRPR
