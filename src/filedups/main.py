@@ -63,12 +63,11 @@ def find_duplicate_groups(IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  
     FINDER: DuplicateFinder = DuplicateFinder(FINDX)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
-    hs1 = 64 * CONST.xBYTE
-    hs2 = 1 * CONST.xKB
+    hash_sizes = [64 * CONST.xBYTE, 1 * CONST.xKB]
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
-        , GRPR.sha512_first_X_bytes(X=hs1) \
-        , GRPR.sha512_first_X_bytes(X=hs2) \
+        , GRPR.sha512_first_X_bytes(X = hash_sizes[0]) \
+        , GRPR.sha512_first_X_bytes(X = hash_sizes[1]) \
     ]
     
     
@@ -76,68 +75,20 @@ def find_duplicate_groups(IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  
                                     all_indices, grouper_funcs)
     #
     
-    result = {"groups": found_groups \
+    result_data = {"groups": found_groups \
         , "finder": FINDER \
-        , "findx": FINDX 
+        , "findx": FINDX \
+        , "locations": locations \
+        , "hash_sizes": hash_sizes \
+        , "IN_PATHS": IN_PATHS \
+        , "fls_unfiltered": fls_unfiltered \
     }
     
-    return result
+    return result_data
 #)
 
 
-#from memory_profiler import profile
-
-#@profile
-def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None):    
-    string_seq: List = []
-    
-    string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
-    string_seq.append('\n')
-    
-    now_str = UT.get_now_str()
-    
-    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
-    string_seq.append('\n')
-    
-    
-    """
-    string_seq.append("Paths: \n")
-    string_seq.append( '\n'.join(IN_PATHS) )
-    string_seq.append('\n\n')
-    
-    
-    string_seq.extend( ["Total number of unfiltered files to search=", len(fls_unfiltered)] )
-    string_seq.append('\n')
-    
-    string_seq.extend( ["SMALLEST_FILE_SIZE_BYTE(bytes)=", MIN_SIZE_LIMIT] )
-    string_seq.append('\n')
-    
-    string_seq.extend( ["Using size filter. Size(bytes)=", MIN_SIZE_LIMIT] )
-    string_seq.append('\n')
-    
-    
-    string_seq.extend( ["Total number of filtered files to search=", len(locations)] )
-    string_seq.append('\n')
-    
-    string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(hs1,hs2)] )
-    #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
-    string_seq.append('\n')
-    """
-    
-    string_seq.extend( ["T.1 ; == ; Group id ; File size ; File Path"] )
-    #string_seq.extend( ["Groupers=size,{}-hash".format(hs1)] )
-    string_seq.append('\n')
-    
-    TM_beg = time.perf_counter()
-    
-    result_mapping = find_duplicate_groups(IN_DIRS, MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
-    
-    TM_end_group = time.perf_counter()
-    
-    found_groups = result_mapping["groups"]
-    FINDER = result_mapping["finder"]
-    FINDX = result_mapping["findx"]
-    
+def write_typed_group_data(found_groups, FINDER, FINDX, MIN_SIZE_LIMIT, string_seq): #(
     idx_grp = 0
     for i, grp in enumerate(found_groups):  #(
         
@@ -174,6 +125,66 @@ def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None)
         
         idx_grp += 1
     #)
+#)
+
+
+#from memory_profiler import profile
+
+#@profile
+def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None):    
+    TM_beg = time.perf_counter()
+    
+    results = find_duplicate_groups(IN_DIRS, MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
+    
+    TM_end_group = time.perf_counter()
+    
+    locations = results["locations"]
+    hash_sizes = results["hash_sizes"]
+    IN_PATHS = results["IN_PATHS"]
+    fls_unfiltered = results["fls_unfiltered"]
+    
+    string_seq: List = []
+    
+    string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
+    string_seq.append('\n')
+    
+    now_str = UT.get_now_str()
+    
+    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
+    string_seq.append('\n')
+    
+    
+    
+    string_seq.append("Paths: \n")
+    string_seq.append( '\n'.join(IN_PATHS) )
+    string_seq.append('\n\n')
+    
+    
+    string_seq.extend( ["Total number of unfiltered files to search=", len(fls_unfiltered)] )
+    string_seq.append('\n')
+    
+    string_seq.extend( ["Using size filter. Min Size(bytes)=", MIN_SIZE_LIMIT] )
+    string_seq.append('\n')
+    string_seq.extend( ["Using size filter. Max Size(bytes)=", MAX_SIZE_LIMIT] )
+    string_seq.append('\n')
+    
+    
+    string_seq.extend( ["Total number of filtered files to search=", len(locations)] )
+    string_seq.append('\n')
+    
+    string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(*hash_sizes)] )
+    string_seq.append('\n')
+    
+    
+    string_seq.extend( ["T.1 ; == ; Group id ; File size ; File Path"] )
+    string_seq.append('\n')
+    
+    found_groups = results["groups"]
+    FINDER = results["finder"]
+    FINDX = results["findx"]
+    
+    # Write groups to str buffer. Each line holds at least a group id and a path.
+    write_typed_group_data(found_groups, FINDER, FINDX, MIN_SIZE_LIMIT, string_seq)
     
     TM_end_str_write = time.perf_counter()
 
