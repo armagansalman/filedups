@@ -21,67 +21,6 @@
 """
 
 
-"""
-
-Design/Decisions/Definitions:
-    + A 'file' is an ordered sequence of bytes.
-        It has a non-negative size. 
-        A slice of its bytes can be read given a 'start_idx' and
-        'end_idx'.
-    
-    + FilesInfo type:
-        + Has 'locations' iterable which holds multiple 'location' 
-        values. A 'location' can be any type as long as it can be read 
-        from a user given reader function.
-        
-        + Has 'reader_func' function that reads and returns bytes from
-        a file. If 'end_idx' is bigger than file length, reads all 
-        the way to the end (starting at 'start_idx').
-        
-            Its signature is:
-        byte[] reader_func(location: Any, start_idx: int, end_idx: int)
-
-        + Has 'size_getter' function that returns the number of bytes 
-        the file has.
-        
-            Its signature is:
-        non_negative_int size_getter(location: Any)
-    
-    + FileIndexer type:
-        + Why: To easily handle different location types and
-        reader functions. For example, a FilesInfo object might hold 
-        local files and another one holds links to web documents.
-        Core part of the program doesn't have to know about such 
-        differences.
-        
-        + An object of this type (e.g FIDX) assigns every location
-        an index (e.g lidx). Using this lidx, its related 'location',
-        'reader_func', 'size_getter' can be retrieved in an uniform way
-        via FIDX.
-        
-    + DuplicateFinder type:
-        + Accepts a 'FileIndexer' object and a float value that denotes
-        how similar can two files be if they are to be grouped as 
-        duplicate. For example, 25% means that at least 25% of the files' 
-        content starting from index 0 to 25% of the file must be the same.
-        
-        Concrete example: For 25% similarity constraint,
-        file-1 = [0,1,0,0,1,0,1,1]
-        file-2 = [1,1,0,0,1,0,1,1]
-        these two files would NOT be grouped as duplicates. Because 
-        their first element is different.
-        
-        + Has 'get_file_indexer' function. Returns the FileIndexer member.
-        
-        + Has 'group_files' function. Takes similarity percentage as float.
-        A FileGroup is an iterable of file indices (from FileIndexer).
-        'group_files' function returns an iterable of FileGroup elements. 
-        
-        + TODO(armagan): ???optional byte count constraint.
-        + TODO(armagan): ???Make 'DuplicateFinder' just a function interface.
-"""
-
-
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
 
 from common_types import *
