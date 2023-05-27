@@ -18,13 +18,8 @@
 
 
 
-# WARNING: Don't use print on Windows. Errors like "UnicodeEncodeError: 
-# 'charmap' codec can't encode character '\u015f'" can occur
-
-# NOTE(armagan): 512 bytes seem reasonable for the first pass (0th pass is always size pass).
-# NOTE(armagan): 8 kilo bytes seem reasonable for the second pass.
-# TODO(armagan): For printing paths, split filename, write filename first.
-# then write its path.
+# WARNING: Errors like "UnicodeEncodeError: 
+# 'charmap' codec can't encode character '\u015f'" can occur on Windows terminal.
 
 
 import time
@@ -60,11 +55,12 @@ def find_duplicate_groups(IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  
     FINDER: DuplicateFinder = DuplicateFinder(FINDX)
     all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
     
-    hash_sizes = [64 * CONST.xBYTE, 1 * CONST.xKB]
+    #hash_sizes = [64 * CONST.xBYTE, 1 * CONST.xKB]
+    hash_sizes = [2048 * CONST.xBYTE]
     
     grouper_funcs: List[GroupFunc_t] = [ GRPR.group_by_size \
         , GRPR.sha512_first_X_bytes(X = hash_sizes[0]) \
-        , GRPR.sha512_first_X_bytes(X = hash_sizes[1]) \
+        #, GRPR.sha512_first_X_bytes(X = hash_sizes[1]) \
     ]
     
     
@@ -110,13 +106,9 @@ def write_typed_group_data(found_groups, FINDER, FINDX, MIN_SIZE_LIMIT, string_s
         string_seq.append('~\n')
         
         for loc_idx in grp:  #(
-            # TODO(armagan): This is an ugly way and code. Use PyConst or
-            # immutable data structures instead of class/objects.
-            # ??https://github.com/tobgu/pyrsistent
-            
             loc = FINDER.FIDX.get_location(loc_idx)
             
-            string_seq.extend( [f"T.1 ; G: {idx_grp} ; S: {fsize_kb:1.2f} (KB) ; P: {loc}"])
+            string_seq.extend( [f"T:1 ; G: {idx_grp} ; S: {fsize_kb:1.2f} (KB) ; P: {loc}"])
             string_seq.append('\n')
         #)
         
@@ -128,7 +120,7 @@ def write_typed_group_data(found_groups, FINDER, FINDX, MIN_SIZE_LIMIT, string_s
 #from memory_profiler import profile
 
 #@profile
-def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None):    
+def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None):    
     TM_beg = time.perf_counter()
     
     results = find_duplicate_groups(IN_DIRS, MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
@@ -136,9 +128,14 @@ def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None)
     TM_end_group = time.perf_counter()
     
     locations = results["locations"]
+    locations_len = len(locations)
     hash_sizes = results["hash_sizes"]
     IN_PATHS = results["IN_PATHS"]
     fls_unfiltered = results["fls_unfiltered"]
+    
+    estimated_time_min = "{:.2f}".format(locations_len * 4.6 / 1000)
+    
+    print("<[ INFO ]> Estimated minimum time for cold search = {} seconds".format(estimated_time_min))
     
     string_seq: List = []
     
@@ -166,14 +163,14 @@ def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None)
     string_seq.append('\n')
     
     
-    string_seq.extend( ["Total number of filtered files to search=", len(locations)] )
+    string_seq.extend( ["Total number of filtered files to search=", locations_len] )
     string_seq.append('\n')
     
-    string_seq.extend( ["Groupers=size,{}-hash,{}-hash".format(*hash_sizes)] )
+    string_seq.extend( ["Groupers = size, hashes (bytes)-{}".format(hash_sizes)] )
     string_seq.append('\n')
     
     
-    string_seq.extend( ["T.1 ; == ; Group id ; File size ; File Path"] )
+    string_seq.extend( ["T:1 ; == ; Group id ; File size ; File Path"] )
     string_seq.append('\n')
     
     found_groups = results["groups"]
@@ -210,22 +207,6 @@ def main_4(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None)
     UT.append_file_text_utf8(out_fpath, ' '.join(stringified))
 #
 
-
-def trials(trial_count: int, search_paths: List[str], SMALLEST_FILE_SIZE_BYTE: int):
-    NOW = UT.get_now_str()
-
-    for i in range(trial_count):
-        
-        OUTFILE_PATH = "filedups ({}) (at least ({:2.2f} bytes)).txt".format(NOW, SMALLEST_FILE_SIZE_BYTE/1024)
-        
-        # TODO(armagan): Separate apply func. and write to file.
-        # TODO(armagan): Create LocalFileFinder
-        # TODO(armagan): Combine 1 byte size filter and size grouper for performance.
-        
-        main_4(OUTFILE_PATH, search_paths, SMALLEST_FILE_SIZE_BYTE = SMALLEST_FILE_SIZE_BYTE)
-    #
-#
-
 def check_existence_paths(paths: list):  #(
     import os
     
@@ -241,7 +222,7 @@ def main(args):  #(
     
     logging.basicConfig(filename=f"filedups ({NOW}).log", encoding='utf-8', level=logging.DEBUG)
     
-    DEFAULT_MIN_FSIZE = 100 * CONST.xKB
+    DEFAULT_MIN_FSIZE = 1000 * CONST.xKB
     
     SMALLEST_FSIZE = DEFAULT_MIN_FSIZE
     
@@ -268,15 +249,11 @@ def main(args):  #(
     
     OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
     
-    return main_4(OUTFILE_PATH, search_paths, SMALLEST_FSIZE, MAX_FSIZE)
+    return find_and_write_duplicates(OUTFILE_PATH, search_paths, SMALLEST_FSIZE, MAX_FSIZE)
 #)
 
 
 if __name__ == "__main__":
-    # TODO(Armağan): Restructure and clean the code.
-    # TODO(Armağan): Given args for directories OR do gui as explained below:
-    # TODO(Armağan): Use PySimpleGUI to select input text file that holds search directories.
-    # 
     import sys
     
     if len(sys.argv) < 2:  #(
