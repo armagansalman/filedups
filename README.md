@@ -26,6 +26,3 @@ Go to src/filedups in terminal.
 
 <br>Results will be in a text file of current working directory of command line
 <br>, which starts with filedups and contains timestamp of the scan.
-
-### Notes
-36652 beginning files, 11002 files after filter, size,64-hash,1024-hash TOOK 164 seconds (on USB 2.0, external 5400 rpm hard disk).
