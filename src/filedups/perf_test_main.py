@@ -1,9 +1,5 @@
 """
-    <This file is a part of the program armaganymmt-prj-1_name.
-    armaganymmt-prj-1_name processes files from different kinds of
-    locations to find duplicate files.>
-    
-    Copyright (C) <2021>  <Armağan Salman> <gmail,protonmail: armagansalman>
+    Copyright (C) 2021-2023  Armağan Salman
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+
 
 
 """
