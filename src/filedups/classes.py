@@ -98,7 +98,6 @@ class FileIndexer:
     
     
     def get_data_len(self) -> int:
-        # Total number of locations minus 1.
         return len(self.data)
     #
     
@@ -167,7 +166,6 @@ class DuplicateFinder:
     
     def apply_multiple_groupers(self, LOCS: LocationIndices_t, \
                     GROUPERS: List[GroupFunc_t]) -> LocationGroups_t:
-        # TODO(armagan): ???User MUST ??? match percentage.
         GROUPER_FUNC_IDX = 0
         result_groups: LocationGroups_t = self.rec_apply(LOCS, \
                                             GROUPER_FUNC_IDX, GROUPERS)

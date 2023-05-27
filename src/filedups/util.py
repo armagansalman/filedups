@@ -239,31 +239,6 @@ def file_sha512(file_path, size_to_read):
     return hs.hexdigest()
 #
 
-
-"""
-def getSHA256(currentFile, full=False):
-	#Read the 64k at a time, hash the buffer & repeat till finished. 
-	#By default only checksum the first block
-	hasher = hashlib.sha256()
-	with open(currentFile, 'rb') as file:
-		buf = file.read(BLOCKSIZE)
-		while len(buf) > 0:
-			hasher.update(buf)
-			if not full:
-				break
-			buf = file.read(BLOCKSIZE)
-	return hasher.hexdigest()
-"""
-
-
-
-"""
-with io.open(filename,'r',encoding='utf8') as f:
-    text = f.read()
-# process Unicode text
-with io.open(filename,'w',encoding='utf8') as f:
-    f.write(text)
-"""
 def write_file_utf8(fpath: str, text: str, OPEN_MODE: str):
 
     with io.open(fpath, OPEN_MODE, encoding='utf8') as F:
@@ -306,3 +281,31 @@ def read_file_text(fpath: str, encoding: str = 'utf8'):  #(
         return fr.readlines()
     #)
 #
+
+
+
+
+"""
+def getSHA256(currentFile, full=False):
+	#Read the 64k at a time, hash the buffer & repeat till finished. 
+	#By default only checksum the first block
+	hasher = hashlib.sha256()
+	with open(currentFile, 'rb') as file:
+		buf = file.read(BLOCKSIZE)
+		while len(buf) > 0:
+			hasher.update(buf)
+			if not full:
+				break
+			buf = file.read(BLOCKSIZE)
+	return hasher.hexdigest()
+"""
+
+
+
+"""
+with io.open(filename,'r',encoding='utf8') as f:
+    text = f.read()
+# process Unicode text
+with io.open(filename,'w',encoding='utf8') as f:
+    f.write(text)
+"""

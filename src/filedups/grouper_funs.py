@@ -85,20 +85,3 @@ def sha512_first_X_bytes(X: int) -> GroupFunc_t:
     
     return grouper
 #
-
-# Type Definitions:                        
-#LowMaybe = Optional[int]
-#HighMaybe = Optional[int]
-
-
-def make_filter_group_by_size(low: MaybeInt, high: MaybeInt) \
-        -> GroupFunc_t:
-    #
-    def filter_group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t, \
-            PERC: MatchPercentage_t) -> LocationGroups_t:
-        # 4 cases for low,high = 0,0;0,1;1,0;1,1
-        return None
-    #
-    
-    return filter_group_by_size
-#
