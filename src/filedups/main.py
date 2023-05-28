@@ -139,7 +139,7 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     
     string_seq: List = []
     
-    string_seq.extend( ["======= filedups-main-4 function begining ======= "] )
+    string_seq.extend( ["======= filedups find_and_write_duplicates function begining ======= "] )
     string_seq.append('\n')
     
     now_str = UT.get_now_str()
