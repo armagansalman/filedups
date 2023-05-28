@@ -5,7 +5,7 @@
 ## HOW TO USE
 Go to src/filedups in terminal.
 <br>Put full paths of directories you want to search in in-dirs.txt file on separate lines.
-<br>Options (M, X are the number of bytes) (default value is 1024000 (1000 KB)): 
+<br>Options (M, X are the number of bytes) (default value for M is 1024000 (1000 KB)): 
 <br>--min-file-size M
 <br>--max-file-size X
 
