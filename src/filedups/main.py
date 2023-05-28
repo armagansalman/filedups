@@ -133,7 +133,8 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     IN_PATHS = results["IN_PATHS"]
     fls_unfiltered = results["fls_unfiltered"]
     
-    estimated_time_min = "{:.2f}".format(locations_len * 4.6 / 1000)
+    time_per_file_ms = 14
+    estimated_time_min = "{:.2f}".format(locations_len * time_per_file_ms / 1000)
     
     print("<[ INFO ]> Estimated minimum time for cold search = {} seconds".format(estimated_time_min))
     
