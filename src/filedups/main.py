@@ -41,6 +41,11 @@ def find_duplicate_groups(IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  
     
     fls_unfiltered: Set[str] = UT.get_fpaths_from_path_iter(IN_PATHS)
     
+    time_per_file = 0.00010874
+    estimated_time_min = "{:.2f}".format(len(fls_unfiltered) * time_per_file)
+    
+    print("<[ INFO ]> Estimated minimum time for cold search = {} seconds".format(estimated_time_min))
+    
     SMALLEST_SIZE: int = MIN_SIZE_LIMIT
     
     locations: Set[str] = set(UT.filter_by_size(fls_unfiltered, \
@@ -132,12 +137,6 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     hash_sizes = results["hash_sizes"]
     IN_PATHS = results["IN_PATHS"]
     fls_unfiltered = results["fls_unfiltered"]
-    
-    # TODO(Armağan): Do time estimate.
-    time_per_file_ms = 14
-    estimated_time_min = "{:.2f}".format(locations_len * time_per_file_ms / 1000)
-    
-    #print("<[ INFO ]> Estimated minimum time for cold search = {} seconds".format(estimated_time_min))
     
     string_seq: List = []
     
