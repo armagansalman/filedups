@@ -242,6 +242,7 @@ def main(args):  #(
     check_existence_paths(search_paths)
     
     print("<[ INFO ]> Finding duplicates...")
+    print("<[ INFO ]> It can take minutes to hours depending on the number of files.")
     
     OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
     
