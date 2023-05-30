@@ -243,6 +243,7 @@ def main(args):  #(
     
     print("<[ INFO ]> Finding duplicates...")
     print("<[ INFO ]> It can take minutes to hours depending on the number of files.")
+    print("<[ INFO ]> It takes around 3 minutes to filter 284000 files to 40300 files and then find duplicates.")
     
     OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
     
