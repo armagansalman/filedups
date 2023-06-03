@@ -97,25 +97,30 @@ def write_typed_group_data(found_groups, FINDER, FINDX, MIN_SIZE_LIMIT, string_s
                 
         loc_idx = grp[0]
         loc = FINDER.FIDX.get_location(loc_idx)
-        fsize_tpl = FINDER.FIDX.get_size_func(loc_idx)(loc)
-        fsize_byte = fsize_tpl[1]
-        fsize_kb = fsize_byte / 1024  # Turns from BYTE -> KB
         
-        # TODO(Armagan): Tidy up this mess of a function.
-        
-        SKIP_SIZE_BYTE = MIN_SIZE_LIMIT  # Don't show files smaller than this KB of size.
-        
-        if fsize_byte < SKIP_SIZE_BYTE:
-            continue
-        
-        string_seq.append('~\n')
-        
-        for loc_idx in grp:  #(
-            loc = FINDER.FIDX.get_location(loc_idx)
+        try:
+            fsize_tpl = FINDER.FIDX.get_size_func(loc_idx)(loc)
+            fsize_byte = fsize_tpl[1]
+            fsize_kb = fsize_byte / 1024  # Turns from BYTE -> KB
             
-            string_seq.extend( [f"T:1 ; G: {idx_grp} ; S: {fsize_kb:1.2f} (KB) ; P: {loc}"])
-            string_seq.append('\n')
-        #)
+            # TODO(Armagan): Tidy up this mess of a function.
+            
+            SKIP_SIZE_BYTE = MIN_SIZE_LIMIT  # Don't show files smaller than this KB of size.
+            
+            if fsize_byte < SKIP_SIZE_BYTE:
+                continue
+            
+            string_seq.append('~\n')
+            
+            for loc_idx in grp:  #(
+                loc = FINDER.FIDX.get_location(loc_idx)
+                
+                string_seq.extend( [f"T:1 ; G: {idx_grp} ; S: {fsize_kb:1.2f} (KB) ; P: {loc}"])
+                string_seq.append('\n')
+            #)
+        except:
+            logging.error(f"Couldn't get size of file: {loc}")
+
         
         idx_grp += 1
     #)
