@@ -26,3 +26,8 @@ Go to src/filedups in terminal.
 
 <br>Results will be in a text file of current working directory of command line
 <br>, which starts with filedups and contains timestamp of the scan.
+
+## Notes
+It takes at least 3 minutes to filter 284000 files to 40300 files and then find duplicates.
+<br>It takes at least 19 minutes to filter 286000 files to 140000 files and then find duplicates.
+    

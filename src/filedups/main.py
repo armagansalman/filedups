@@ -72,8 +72,10 @@ def main(args):  #(
     check_existence_paths(search_paths)
     
     print("<[ INFO ]> Finding duplicates...")
+    print(f"<[ INFO ]> Search started at: {UT.get_now_str()}")
     print("<[ INFO ]> It can take minutes to hours depending on the number of files.")
-    print("<[ INFO ]> It takes around 3 minutes to filter 284000 files to 40300 files and then find duplicates.")
+    print("<[ INFO ]> It takes at least 3 minutes to filter 284000 files to 40300 files and then find duplicates.")
+    print("<[ INFO ]> It takes at least 19 minutes to filter 286000 files to 140000 files and then find duplicates.")
     
     OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
     
