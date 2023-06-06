@@ -45,10 +45,11 @@ class FilesInfo:
 
 
 # Type Definition:
-FileTriple = Tuple[Location, ReaderFunc, SizeFunc]
+# FileTriple = Tuple[Location, ReaderFunc, SizeFunc]
+IndexedFile = Tuple[Any, int]
 
 class FileIndexer:
-    data = None
+    data: Any = None
     fns_file_reader: List[Callable] = None
     fns_file_size: List[Callable] = None
     
@@ -64,7 +65,7 @@ class FileIndexer:
             self.fns_file_size.append(files_info.size_getter)
             
             for loc in files_info.locations:
-                info: FileTriple = (loc, finfo_idx)
+                info: IndexedFile = (loc, finfo_idx)
                     
                 self.data.append(info)
             #
@@ -73,26 +74,26 @@ class FileIndexer:
     #
     
     
-    def get_file_info(self, idx: int) -> FileTriple:
-        info: FileTriple = self.data[idx]
+    def get_file_info(self, idx: int) -> IndexedFile:
+        info: IndexedFile = self.data[idx]
         return info
     #
     
     
     def get_location(self, idx: int) -> Location:
-        info: FileTriple = self.get_file_info(idx)
+        info: IndexedFile = self.get_file_info(idx)
         return info[0]
     #
     
     
     def get_reader(self, idx: int) -> ReaderFunc:
-        info: FileTriple = self.get_file_info(idx)
+        info: IndexedFile = self.get_file_info(idx)
         return self.fns_file_reader[info[1]]
     #
     
     
     def get_size_func(self, idx: int) -> SizeFunc:
-        info: FileTriple = self.get_file_info(idx)
+        info: IndexedFile = self.get_file_info(idx)
         return self.fns_file_size[info[1]]
     #
     

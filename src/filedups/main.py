@@ -33,7 +33,7 @@ import util as UT
 import filedups
 
 
-def check_existence_paths(paths: list):  #(
+def check_existence_paths(paths: list[str]):  #(
     import os
     
     for idx, pt in enumerate(paths):  #(
@@ -43,7 +43,7 @@ def check_existence_paths(paths: list):  #(
 #)
 
 
-def main(args):  #(
+def main(args: dict):  #(
     NOW = UT.get_now_str()
     
     logging.basicConfig(filename=f"filedups ({NOW}).log", encoding='utf-8', level=logging.DEBUG)
