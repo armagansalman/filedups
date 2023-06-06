@@ -1,6 +1,6 @@
-Current Version = 0.5.1 (2023-04-15)
+Current Version = 0.6.0 (2023-06-06)
 
--[
+[+
 This project uses Semantic Versioning 2.0.0
 
 Following lines were taken from https://semver.org
@@ -13,10 +13,18 @@ Following lines were taken from https://semver.org
 	MINOR version when you add functionality in a backwards compatible manner, and
 	PATCH version when you make backwards compatible bug fixes.
 	Additional labels for pre-release and build metadata are available as extensions to the MAJOR.MINOR.PATCH format.
-]+
++]
 
 
 === VERSION HISTORY ===
+
+[+
+
++ semver(2.0.0) = 0.6.0
+    + filedups.py added.
+        + Functions in main.py were moved to filedups.py
+
++]
 
 
 + semver(2.0.0) = 0.5.1
