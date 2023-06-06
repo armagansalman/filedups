@@ -50,11 +50,11 @@ def main(args):  #(
     
     DEFAULT_MIN_FSIZE = 1000 * CONST.xKB
     
-    SMALLEST_FSIZE = DEFAULT_MIN_FSIZE
+    MIN_FSIZE = DEFAULT_MIN_FSIZE
     
     msize = args["min_file_size"]
     if msize != None:
-        SMALLEST_FSIZE = int(msize)
+        MIN_FSIZE = int(msize)
     #
     
     MAX_FSIZE = args["max_file_size"]
@@ -77,9 +77,9 @@ def main(args):  #(
     print("<[ INFO ]> It takes at least 3 minutes to filter 284000 files to 40300 files and then find duplicates.")
     print("<[ INFO ]> It takes at least 19 minutes to filter 286000 files to 140000 files and then find duplicates.")
     
-    OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(SMALLEST_FSIZE/1024))
+    OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(MIN_FSIZE/1024))
     
-    return filedups.find_and_write_duplicates(OUTFILE_PATH, search_paths, SMALLEST_FSIZE, MAX_FSIZE)
+    return filedups.find_and_write_duplicates(OUTFILE_PATH, search_paths, MIN_FSIZE, MAX_FSIZE)
 #)
 
 
