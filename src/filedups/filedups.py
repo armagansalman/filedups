@@ -209,5 +209,5 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     
     stringified = map(str, string_seq)
     
-    UT.append_file_text_utf8(out_fpath, ' '.join(stringified))
+    UT.append_file_text_utf8(out_fpath, ''.join(stringified))
 #
