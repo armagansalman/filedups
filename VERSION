@@ -1,4 +1,4 @@
-Current Version = 0.6.0 (2023-06-06)
+Current Version = 0.7.0 (2023-09-12)
 
 [+
 This project uses Semantic Versioning 2.0.0
@@ -17,6 +17,15 @@ Following lines were taken from https://semver.org
 
 
 === VERSION HISTORY ===
+
+[+
+
++ semver(2.0.0) = 0.7.0
+    + Removed FilesInfo and FileIndexer classes.
+    + Reported results are now sorted by size in descending order.
+
++]
+
 
 [+
 
