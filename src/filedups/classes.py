@@ -66,7 +66,7 @@ class DuplicateFinder:
                     GROUPERS: List[Callable]) \
                     -> LocationGroups_t:
         #
-        locs: Set[int] = set(file_indices)
+        locs: Set[int] = file_indices
         
         if len(locs) < 2 or FUNC_IDX >= len(GROUPERS):
             # Fewer than 2 files can't be duplicates. 

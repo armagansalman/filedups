@@ -48,7 +48,7 @@ def find_duplicates(file_paths: Set[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  #(
     #
     
     FINDER: DuplicateFinder = DuplicateFinder(filtered_locations)
-    all_indices: Set[int] = FINDER.get_all_file_indices()
+    all_indices: List[int] = FINDER.get_all_file_indices()
         
     #hash_sizes = [64 * CONST.xBYTE, 1 * CONST.xKB]
     hash_sizes = [2048 * CONST.xBYTE]
@@ -90,12 +90,35 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq): #(
     idx_grp = 0
     ALL_PATHS = FINDER.get_file_paths()
     
-    for i, grp in enumerate(found_groups):  #(
+    groups_with_size = []
+    
+    for group in found_groups:
+        group = list(group)
         
-        grp = list(grp)
-        if len(grp) < 2:  #(
+        if len(group) < 2:  #(
             continue # Skip unique files.
         #)
+        
+        loc = ALL_PATHS[group[0]]
+        
+        try:
+            fsize_tpl = UT.get_file_size_in_bytes(loc)
+            fsize_byte = fsize_tpl[1]
+            
+            if fsize_byte < MIN_SIZE_LIMIT:
+                continue
+            #
+            groups_with_size.append((group, fsize_byte))
+        #
+        except:
+            logging.error(f"Couldn't get size of file: {loc}")
+        #
+    #
+    groups_with_size.sort(key = lambda x: x[1], reverse = True)
+        
+    for i, group_and_size in enumerate(groups_with_size):  #(
+        
+        grp, SIZE = group_and_size
         
         loc = ALL_PATHS[grp[0]] # Take an element for getting size.
 
