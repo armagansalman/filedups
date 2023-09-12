@@ -24,128 +24,50 @@ SOFTWARE.
 """
 
 
-# Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
-
 from common_types import *
 
 
+# Some type definitions:
 StartIdx = int
 EndIdx = int
-
-Location = Any
-ReaderFunc = Callable[[Any, StartIdx, EndIdx], Tuple[bool, bytes]]
-SizeFunc = Callable[[Any], Tuple[bool, int]]
-
-class FilesInfo:
-    def __init__(self, locations: Iter_t[Any] \
-    , reader_func: ReaderFunc \
-    , size_getter: SizeFunc):
-    #   
-        self.locations: List[Location]  = list(set(locations))
-        # set data type to remove duplicate locations.
-        # Ensure it's subscriptable.
-        
-        self.reader_func = reader_func
-        self.size_getter = size_getter
-    #
-#
-
-
-# Type Definition:
-# FileTriple = Tuple[Location, ReaderFunc, SizeFunc]
-IndexedFile = Tuple[Any, int]
-
-class FileIndexer:
-    data: Any = None
-    fns_file_reader: List[Callable] = None
-    fns_file_size: List[Callable] = None
-    
-    def __init__(self, files_info_iter: Iter_t[FilesInfo]):
-        self.data: List[str] = list()
-        self.fns_file_reader = list()
-        self.fns_file_size = list()
-        
-        finfo_idx = 0
-
-        for files_info in files_info_iter:
-            self.fns_file_reader.append(files_info.reader_func)
-            self.fns_file_size.append(files_info.size_getter)
-            
-            for loc in files_info.locations:
-                info: IndexedFile = (loc, finfo_idx)
-                    
-                self.data.append(info)
-            #
-            finfo_idx += 1
-        #
-    #
-    
-    
-    def get_file_info(self, idx: int) -> IndexedFile:
-        info: IndexedFile = self.data[idx]
-        return info
-    #
-    
-    
-    def get_location(self, idx: int) -> Location:
-        info: IndexedFile = self.get_file_info(idx)
-        return info[0]
-    #
-    
-    
-    def get_reader(self, idx: int) -> ReaderFunc:
-        info: IndexedFile = self.get_file_info(idx)
-        return self.fns_file_reader[info[1]]
-    #
-    
-    
-    def get_size_func(self, idx: int) -> SizeFunc:
-        info: IndexedFile = self.get_file_info(idx)
-        return self.fns_file_size[info[1]]
-    #
-    
-    
-    def get_data_len(self) -> int:
-        return len(self.data)
-    #
-    
-    
-    def get_all_indices(self) -> List[int]:
-        return [x for x in range(self.get_data_len())]
-    #
-    
-#
-
-
-# Some type definitions:
-GroupFunc_t = Callable[[FileIndexer, LocationIndices_t], LocationGroups_t]
+Locations = List[int]
 
 
 class DuplicateFinder:
-    FIDX = None  # File Indexer
+    
+    FILE_PATHS = None  # File Indexer
 	
-    def __init__(self, FILE_INDEXER: FileIndexer):
-        self.FIDX = FILE_INDEXER
-    #
-    
-    
-    def get_file_indexer(self):
-        return self.FIDX
-    #
-    
-    
-    def apply_one_grouper(self, LOCS: LocationIndices_t, \
-                        FUNC: GroupFunc_t) -> LocationGroups_t:
+    def __init__(self, file_paths):
+        if type(file_paths) != list:
+            file_paths = list(file_paths)
         #
-        locs: LocationGroups_t = FUNC(self.FIDX, LOCS)
+        self.FILE_PATHS = file_paths
+    #
+    
+    
+    def get_file_paths(self):
+        return self.FILE_PATHS
+    #
+    
+    def get_all_file_indices(self):
+        return [i for i in range(len(self.FILE_PATHS))]
+    #
+    
+    def apply_one_grouper(self, file_indices, \
+                        FUNC) \
+                        -> LocationGroups_t:
+        #
+        locs: LocationGroups_t = FUNC(self, file_indices)
         return locs
     #
     
     
-    def rec_apply(self, LOCS: LocationIndices_t, FUNC_IDX: int, \
-                    GROUPERS: List[GroupFunc_t]) -> LocationGroups_t:
+    def rec_apply(self, file_indices, FUNC_IDX: int, \
+                    GROUPERS: List[Callable]) \
+                    -> LocationGroups_t:
         #
-        locs: Set[int] = set(LOCS)
+        locs: Set[int] = set(file_indices)
+        
         if len(locs) < 2 or FUNC_IDX >= len(GROUPERS):
             # Fewer than 2 files can't be duplicates. 
             # OR No grouper func. left to apply.
@@ -157,7 +79,7 @@ class DuplicateFinder:
         #
         
         NEXT_FUNC_IDX = FUNC_IDX + 1
-        combined_groups: List[LocationIndices_t] = []
+        combined_groups = []
         
         for grp in loc_groups:
             sub_grp_result: LocationGroups_t = self.rec_apply(grp, \
@@ -172,10 +94,11 @@ class DuplicateFinder:
     #
     
     
-    def apply_multiple_groupers(self, LOCS: LocationIndices_t, \
-                    GROUPERS: List[GroupFunc_t]) -> LocationGroups_t:
+    def apply_multiple_groupers(self, file_paths, \
+                    GROUPERS: List[Callable]) -> LocationGroups_t:
         GROUPER_FUNC_IDX = 0
-        result_groups: LocationGroups_t = self.rec_apply(LOCS, \
+        
+        result_groups: LocationGroups_t = self.rec_apply(file_paths, \
                                             GROUPER_FUNC_IDX, GROUPERS)
         #
         return result_groups
@@ -183,3 +106,4 @@ class DuplicateFinder:
     
 #
 
+GroupFunc_t = Callable[[DuplicateFinder, Locations], LocationGroups_t]

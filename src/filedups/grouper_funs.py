@@ -29,13 +29,14 @@ from common_types import *
 from classes import *
 
 
-def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t) -> LocationGroups_t:
+def group_by_size(FINDER, INDICES: List[int]) -> LocationGroups_t:
     
     size_groups: Dict[int, Set[int]] = dict()
-    for IDX in LOCS:
-        LOC = FIDX.get_location(IDX)
-        SFUN = FIDX.get_size_func(IDX)
-        SIZE: Maybe = SFUN(LOC)
+    all_paths = FINDER.get_file_paths()
+    
+    for idx in INDICES:
+        LOC = all_paths[idx]
+        SIZE: Maybe = UT.get_file_size_in_bytes(LOC)
         
         # TODO(armagan): Report/except when SIZE == None.
         if is_nothing(SIZE):
@@ -45,7 +46,7 @@ def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t) -> LocationGroups_
         
         # Group location indices which have the same size:
         group: Set[int] = size_groups.get(sz, set())
-        group.add(IDX)
+        group.add(idx)
         size_groups[sz] = group
     #
     
@@ -60,13 +61,14 @@ def group_by_size(FIDX: FileIndexer, LOCS: LocationIndices_t) -> LocationGroups_
 
 def sha512_first_X_bytes(X: int) -> GroupFunc_t:
     #
-    def grouper(FIDX: FileIndexer, LOCS: LocationIndices_t) -> LocationGroups_t:
+    def grouper(FINDER, INDICES: List[int]) -> LocationGroups_t:
         #
         hash_groups: Dict[int, Set[int]] = dict()
-        
-        for IDX in LOCS:
-            LOC = FIDX.get_location(IDX)
-            read_func = FIDX.get_reader(IDX)
+        all_paths = FINDER.get_file_paths()
+
+        for idx in INDICES:
+            LOC = all_paths[idx]
+            read_func = UT.local_file_reader_first_bytes
             FIRST_X_BYTES = read_func(LOC, X) # end byte idx = X-1
             
             # TODO(armagan): Report/except when FIRST_X_BYTES == None.
@@ -78,7 +80,7 @@ def sha512_first_X_bytes(X: int) -> GroupFunc_t:
             hex_hash = UT.sha512_bytes(data)
             
             group: Set[int] = hash_groups.get(hex_hash, set())
-            group.add(IDX)
+            group.add(idx)
             hash_groups[hex_hash] = group
         #
         

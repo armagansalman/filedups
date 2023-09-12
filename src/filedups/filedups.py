@@ -31,7 +31,7 @@ import logging
 #(
 from common_types import *
 import constants as CONST
-from classes import FilesInfo, FileIndexer, DuplicateFinder
+from classes import DuplicateFinder, GroupFunc_t
 import argparser_custom as Argp
 import util as UT
 import grouper_funs as GRPR
@@ -39,22 +39,17 @@ import grouper_funs as GRPR
 
 def find_duplicates(file_paths: Set[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  #(
 #(
-    fls_unfiltered: Set[str] = file_paths
+    fls_unfiltered: Set[str] = set(file_paths)
     
     SMALLEST_SIZE: int = MIN_SIZE_LIMIT
     
-    locations: Set[str] = set(UT.filter_by_size(fls_unfiltered, \
+    filtered_locations: Set[str] = set(UT.filter_by_size(fls_unfiltered, \
                             MIN_SIZE_LIMIT, MAX_SIZE_LIMIT))
     #
     
-    fsinfo = FilesInfo(locations, UT.local_file_reader_first_bytes, \
-                        UT.get_local_file_size)
-
-    FINDX = FileIndexer([fsinfo])
-    
-    FINDER: DuplicateFinder = DuplicateFinder(FINDX)
-    all_indices: Set[int] = FINDER.get_file_indexer().get_all_indices()
-    
+    FINDER: DuplicateFinder = DuplicateFinder(filtered_locations)
+    all_indices: Set[int] = FINDER.get_all_file_indices()
+        
     #hash_sizes = [64 * CONST.xBYTE, 1 * CONST.xKB]
     hash_sizes = [2048 * CONST.xBYTE]
     
@@ -63,15 +58,13 @@ def find_duplicates(file_paths: Set[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  #(
         #, GRPR.sha512_first_X_bytes(X = hash_sizes[1]) \
     ]
     
-    
     found_groups: LocationGroups_t = FINDER.apply_multiple_groupers(\
                                     all_indices, grouper_funcs)
     #
     
     result_data = {"groups": found_groups \
-        , "finder": FINDER \
-        , "findx": FINDX \
-        , "locations": locations \
+        , "filtered_locations": filtered_locations \
+        , "FINDER": FINDER \
         , "hash_sizes": hash_sizes \
         , "fls_unfiltered": fls_unfiltered \
     }
@@ -93,34 +86,34 @@ def find_duplicate_from_dirs(IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
 #)
 
 
-def write_typed_group_data(found_groups, FINDER, FINDX, MIN_SIZE_LIMIT, string_seq): #(
+def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq): #(
     idx_grp = 0
+    ALL_PATHS = FINDER.get_file_paths()
+    
     for i, grp in enumerate(found_groups):  #(
         
         grp = list(grp)
         if len(grp) < 2:  #(
             continue # Skip unique files.
         #)
-                
-        loc_idx = grp[0]
-        loc = FINDER.FIDX.get_location(loc_idx)
         
+        loc = ALL_PATHS[grp[0]] # Take an element for getting size.
+
         try:
-            fsize_tpl = FINDER.FIDX.get_size_func(loc_idx)(loc)
+            fsize_tpl = UT.get_file_size_in_bytes(loc)
             fsize_byte = fsize_tpl[1]
             fsize_kb = fsize_byte / 1024  # Turns from BYTE -> KB
             
             # TODO(Armagan): Tidy up this mess of a function.
-            
-            SKIP_SIZE_BYTE = MIN_SIZE_LIMIT  # Don't show files smaller than this KB of size.
-            
-            if fsize_byte < SKIP_SIZE_BYTE:
+
+            # Don't show files smaller than this KB of size.
+            if fsize_byte < MIN_SIZE_LIMIT:
                 continue
             
             string_seq.append('~\n')
             
             for loc_idx in grp:  #(
-                loc = FINDER.FIDX.get_location(loc_idx)
+                loc = ALL_PATHS[loc_idx]
                 
                 string_seq.extend( [f"T:1 ; G: {idx_grp} ; S: {fsize_kb:1.2f} (KB) ; P: {loc}"])
                 string_seq.append('\n')
@@ -143,7 +136,7 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     
     TM_end_group = time.perf_counter()
     
-    locations = results["locations"]
+    locations = results["filtered_locations"]
     locations_len = len(locations)
     hash_sizes = results["hash_sizes"]
     IN_PATHS = results["IN_PATHS"]
@@ -186,11 +179,10 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     string_seq.append('\n')
     
     found_groups = results["groups"]
-    FINDER = results["finder"]
-    FINDX = results["findx"]
+    FINDER = results["FINDER"]
     
     # Write groups to str buffer. Each line holds at least a group id and a path.
-    write_typed_group_data(found_groups, FINDER, FINDX, MIN_SIZE_LIMIT, string_seq)
+    write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq)
     
     TM_end_str_write = time.perf_counter()
 
@@ -204,9 +196,9 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     string_seq.extend( ["Total Elapsed Time:",TM_end_str_write - TM_beg, "seconds."] )
     string_seq.append('\n')
     
-    indices: List[int] = FINDX.get_all_indices()
+    fpaths: List[str] = FINDER.get_file_paths()
     
-    string_seq.extend( [f"Total file count for grouping was: {len(indices)}"] )
+    string_seq.extend( [f"Total file count for grouping was: {len(fpaths)}"] )
     string_seq.append('\n')
 
     string_seq.extend( ["**********************************************************************"] )

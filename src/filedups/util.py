@@ -206,7 +206,7 @@ def local_file_reader_range(file_path: str, start_offset: int, \
 #
 
 
-def filter_by_size(paths: list[str], min_limit = None, max_limit = None):
+def filter_by_size(paths: CT.Iter[str], min_limit = None, max_limit = None):
 #
     included_paths = []
     for pt in paths:  #(
