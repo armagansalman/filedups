@@ -21,8 +21,6 @@ Go to src/filedups in terminal.
 
 <br>For Windows:
 <br>**py main.py in-dirs.txt**
-<br>or
-<br>**python3 main.py in-dirs.txt**
 
 <br>Results will be in a text file of current working directory of command line
 <br>, which starts with filedups and contains timestamp of the scan.
