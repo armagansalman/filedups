@@ -3,11 +3,14 @@
 *.bak
 *.7z
 *.mypy*
+*.spec
 
 #( Ignore these folders:
 __pycache__/
 local/
 output/
+build/
+.venv/
 #)
 
 
@@ -27,6 +30,7 @@ output/
 # Node artifact files
 node_modules/
 dist/
+
 
 # Compiled Java class files
 *.class
