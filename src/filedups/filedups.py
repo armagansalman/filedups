@@ -115,7 +115,7 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows): #(
             logging.error(f"Couldn't get size of file: {loc}")
         #
     #
-    groups_with_size.sort(key = lambda x: x[1], reverse = True)
+    groups_with_size.sort(key = lambda x: x[1], reverse = True)  # Sort groups by size. Descending.
         
     for i, group_and_size in enumerate(groups_with_size):  #(
         
@@ -127,8 +127,6 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows): #(
             fsize_tpl = UT.get_file_size_in_bytes(loc)
             fsize_byte = fsize_tpl[1]
             fsize_kb = fsize_byte / 1024  # Turns from BYTE -> KB
-            
-            # TODO(Armagan): Tidy up this mess of a function.
 
             # Don't show files smaller than this KB of size.
             if fsize_byte < MIN_SIZE_LIMIT:
@@ -139,7 +137,7 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows): #(
             for loc_idx in grp:  #(
                 loc = ALL_PATHS[loc_idx]
                 
-                csv_rows.append( ["T:1", f"G: {idx_grp}", f"S: {fsize_kb:1.2f} (KB)", f"P: {loc}"])
+                csv_rows.append( ["T:1", f"{idx_grp}", f"{fsize_kb:1.2f} (KB)", f"{loc}"])
             #)
 		#)
         except: #(
