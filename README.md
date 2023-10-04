@@ -13,10 +13,10 @@ Go to src/filedups in terminal.
 <br>For Linux:
 <br>**python3 main.py in-dirs.txt**
 
-<br><br>1000 KB minimum file size:
+<br>1000 KB minimum file size:
 <br>**python3 main.py in-dirs.txt --min-file-size 1024000**
 
-<br><br>200 KB minimum, 2000 KB maximum file size:
+<br>200 KB minimum, 2000 KB maximum file size:
 <br>**python3 main.py in-dirs.txt --min-file-size 204800 --max-file-size 2048000**
 
 <br>For Windows:
@@ -24,7 +24,6 @@ Go to src/filedups in terminal.
 
 <br>Results will be in a text file of current working directory of command line
 <br>, which starts with filedups and contains timestamp of the scan.
-
 ## Notes
 It takes at least 3 minutes to filter 284000 files to 40300 files and then find duplicates.
 <br>It takes at least 19 minutes to filter 286000 files to 140000 files and then find duplicates.
