@@ -1,4 +1,4 @@
-Current Version = 0.7.0 (2023-09-12)
+Current Version = 0.8.0
 
 [+
 This project uses Semantic Versioning 2.0.0
@@ -17,6 +17,14 @@ Following lines were taken from https://semver.org
 
 
 === VERSION HISTORY ===
+
+[+	2023-10-04
+
++ semver(2.0.0) = 0.8.0
+    + Results are reported in a .csv file.
+    
++]
+
 
 [+
 
