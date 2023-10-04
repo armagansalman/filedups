@@ -35,6 +35,7 @@ from classes import DuplicateFinder, GroupFunc_t
 import argparser_custom as Argp
 import util as UT
 import grouper_funs as GRPR
+import csv_io as cio
 #)
 
 def find_duplicates(file_paths: Set[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT):  #(
@@ -86,7 +87,7 @@ def find_duplicate_from_dirs(IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
 #)
 
 
-def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq): #(
+def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows): #(
     idx_grp = 0
     ALL_PATHS = FINDER.get_file_paths()
     
@@ -122,7 +123,7 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq): #(
         
         loc = ALL_PATHS[grp[0]] # Take an element for getting size.
 
-        try:
+        try: #(
             fsize_tpl = UT.get_file_size_in_bytes(loc)
             fsize_byte = fsize_tpl[1]
             fsize_kb = fsize_byte / 1024  # Turns from BYTE -> KB
@@ -133,19 +134,19 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq): #(
             if fsize_byte < MIN_SIZE_LIMIT:
                 continue
             
-            string_seq.append('~\n')
+            csv_rows.append(['T:0'])
             
             for loc_idx in grp:  #(
                 loc = ALL_PATHS[loc_idx]
                 
-                string_seq.extend( [f"T:1 ; G: {idx_grp} ; S: {fsize_kb:1.2f} (KB) ; P: {loc}"])
-                string_seq.append('\n')
+                csv_rows.append( ["T:1", f"G: {idx_grp}", f"S: {fsize_kb:1.2f} (KB)", f"P: {loc}"])
             #)
-        except:
+		#)
+        except: #(
             logging.error(f"Couldn't get size of file: {loc}")
 
-        
         idx_grp += 1
+        #)
     #)
 #)
 
@@ -153,6 +154,8 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq): #(
 
 #@profile
 def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None):    
+    NOW_STR = UT.get_now_str()
+    
     TM_beg = time.perf_counter()
     
     results = find_duplicate_from_dirs(IN_DIRS, MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
@@ -165,71 +168,58 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     IN_PATHS = results["IN_PATHS"]
     fls_unfiltered = results["fls_unfiltered"]
     
-    string_seq: List = []
+    csv_rows: List[List[Any]] = []
     
-    string_seq.extend( ["======= filedups find_and_write_duplicates function begining ======= "] )
-    string_seq.append('\n')
+    CSV_DELIMITER = ';'
+    CSV_QUOTECHAR = '"'
     
-    now_str = UT.get_now_str()
+    csv_rows.append([f"csv delimiter = {CSV_DELIMITER}"])
+    csv_rows.append([f"csv quotechar = {CSV_QUOTECHAR}"])
     
-    string_seq.extend( ["Start datetime ISO-8601 = {}".format(now_str)] )
-    string_seq.append('\n')
-    
-    
-    
-    string_seq.append("Paths: \n")
-    string_seq.append( '\n'.join(IN_PATHS) )
-    string_seq.append('\n\n')
+    csv_rows.append( ["T:0", "==", "Empty row"] )
+    csv_rows.append( ["T:1", "==", "Group id", "File size", "File Path"] )
+    csv_rows.append( ["T:2", "==", "Input directory paths"] )
+    csv_rows.append( ["T:3", "==", "Info"] )
     
     
-    string_seq.extend( ["Total number of unfiltered files to search=", len(fls_unfiltered)] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "======= filedups find_and_write_duplicates function begining ======= "] )
     
-    string_seq.extend( ["Using size filter. Min Size(bytes)=", MIN_SIZE_LIMIT] )
-    string_seq.append('\n')
-    string_seq.extend( ["Using size filter. Max Size(bytes)=", MAX_SIZE_LIMIT] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "Start datetime ISO-8601 = {}".format(NOW_STR)] )
+
+    csv_rows.append(["T:2", IN_PATHS])
     
+    csv_rows.append( ["T:3", "Total number of unfiltered files to search=", len(fls_unfiltered)] )
     
-    string_seq.extend( ["Total number of filtered files to search=", locations_len] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "Using size filter. Min Size(bytes)=", MIN_SIZE_LIMIT] )
     
-    string_seq.extend( ["Groupers = size, hashes (bytes)-{}".format(hash_sizes)] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "Using size filter. Max Size(bytes)=", MAX_SIZE_LIMIT] )
     
+    csv_rows.append( ["T:3", "Total number of filtered files to search=", locations_len] )
     
-    string_seq.extend( ["T:1 ; == ; Group id ; File size ; File Path"] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "Groupers = size, hashes (bytes)-{}".format(hash_sizes)] )
     
     found_groups = results["groups"]
     FINDER = results["FINDER"]
     
     # Write groups to str buffer. Each line holds at least a group id and a path.
-    write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, string_seq)
+    write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows)
     
     TM_end_str_write = time.perf_counter()
 
-    string_seq.append('~\n')
-
-    string_seq.extend( ["End datetime ISO-8601 = {}".format(UT.get_now_str())] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "End datetime ISO-8601 = {}".format(UT.get_now_str())] )
     
-    string_seq.extend( ["Elapsed Time for Grouping:",TM_end_group - TM_beg, "seconds."] )
-    string_seq.append('\n')
-    string_seq.extend( ["Total Elapsed Time:",TM_end_str_write - TM_beg, "seconds."] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "Elapsed Time for Grouping:",TM_end_group - TM_beg, "seconds."] )
+    
+    csv_rows.append( ["T:3", "Total Elapsed Time:",TM_end_str_write - TM_beg, "seconds."] )
     
     fpaths: List[str] = FINDER.get_file_paths()
     
-    string_seq.extend( [f"Total file count for grouping was: {len(fpaths)}"] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", f"Total file count for grouping was: {len(fpaths)}"] )
 
-    string_seq.extend( ["**********************************************************************"] )
-    string_seq.append('\n')
+    csv_rows.append( ["T:3", "**********************************************************************"] )
     
+    fname = f"filedups ({NOW_STR}) at least ({MIN_SIZE_LIMIT} bytes).csv"
     
-    
-    stringified = map(str, string_seq)
-    
-    UT.append_file_text_utf8(out_fpath, ''.join(stringified))
+    cio.csv_write_file(fname, csv_rows, delimiter = CSV_DELIMITER \
+						, quotechar = CSV_QUOTECHAR)
 #

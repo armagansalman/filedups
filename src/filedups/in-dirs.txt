@@ -1,3 +1,2 @@
-/home/genel/
-/home/genel/DATA
-/home/genel/App
+/home/rmg/Desktop/
+/home/rmg/Documents/DATA/
