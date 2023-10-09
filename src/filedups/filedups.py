@@ -220,4 +220,6 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     
     cio.csv_write_file(fname, csv_rows, delimiter = CSV_DELIMITER \
 						, quotechar = CSV_QUOTECHAR)
+    #
+    print(f"[ INFO ] Results were written to file: `{fname}`")
 #
