@@ -27,9 +27,13 @@ import csv
 from typing import Iterable, Any
 
 
-def csv_read_file(file_path: str, delimiter: str = ',', quotechar: str = '"'):
+def csv_read_file(
+				file_path: str \
+				, delimiter: str = ',' \
+				, quotechar: str = '"' \
+				, encoding='utf-8'):
 	#
-	with open(file_path, newline='') as csvfile:
+	with open(file_path, newline='', encoding=encoding) as csvfile:
 		csv_reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
 		
 		for row in csv_reader:
@@ -39,11 +43,15 @@ def csv_read_file(file_path: str, delimiter: str = ',', quotechar: str = '"'):
 #
 
 Iter = Iterable
-def csv_write_file(file_path: str, rows: Iter[Iter[Any]], file_mode: str = 'w' \
+def csv_write_file(
+				file_path: str \
+				, rows: Iter[Iter[Any]] \
+				, file_mode: str = 'w' \
 				, delimiter:str = ",", quotechar:str = '"' \
-				, quoting = csv.QUOTE_MINIMAL):
+				, quoting = csv.QUOTE_MINIMAL \
+				, encoding='utf-8'):
 	#
-	with open(file_path, file_mode, newline='') as csvfile:
+	with open(file_path, file_mode, newline='', encoding=encoding) as csvfile:
 		csv_writer = csv.writer(csvfile, delimiter=delimiter,
 								quotechar=quotechar, quoting=quoting)
 		#

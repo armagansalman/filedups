@@ -37,7 +37,9 @@ from common_types import *
 import constants as CONST
 import argparser_custom as Argp
 import util as UT
-import filedups
+import filedups_api as FDAPI
+import csv_io as cio
+
 
 
 def check_existence_paths(paths: list[str]):  #(
@@ -49,6 +51,142 @@ def check_existence_paths(paths: list[str]):  #(
     #)
 #)
 
+def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows): #(
+    idx_grp = 0
+    ALL_PATHS = FINDER.get_file_paths()
+    
+    groups_with_size = []
+    
+    for group in found_groups:
+        group = list(group)
+        
+        if len(group) < 2:  #(
+            continue # Skip unique files.
+        #)
+        
+        loc = ALL_PATHS[group[0]]
+        
+        try:
+            fsize_tpl = UT.get_file_size_in_bytes(loc)
+            fsize_byte = fsize_tpl[1]
+            
+            if fsize_byte < MIN_SIZE_LIMIT:
+                continue
+            #
+            groups_with_size.append((group, fsize_byte))
+        #
+        except:
+            logging.error(f"Couldn't get size of file: {loc}")
+        #
+    #
+    groups_with_size.sort(key = lambda x: x[1], reverse = True)  # Sort groups by size. Descending.
+        
+    for i, group_and_size in enumerate(groups_with_size):  #(
+        
+        grp, SIZE = group_and_size
+        
+        loc = ALL_PATHS[grp[0]] # Take an element for getting size.
+
+        try: #(
+            fsize_tpl = UT.get_file_size_in_bytes(loc)
+            fsize_byte = fsize_tpl[1]
+            fsize_kb = fsize_byte / 1024  # Turns from BYTE -> KB
+
+            # Don't show files smaller than this KB of size.
+            if fsize_byte < MIN_SIZE_LIMIT:
+                continue
+            
+            csv_rows.append(['T:0'])
+            
+            for loc_idx in grp:  #(
+                loc = ALL_PATHS[loc_idx]
+                
+                csv_rows.append( ["T:1", f"{idx_grp}", f"{fsize_kb:1.2f} (KB)", f"{loc}"])
+            #)
+		#)
+        except: #(
+            logging.error(f"Couldn't get size of file: {loc}")
+
+        idx_grp += 1
+        #)
+    #)
+#)
+
+#from memory_profiler import profile
+
+#@profile
+def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX_SIZE_LIMIT = None):    
+    NOW_STR = UT.get_now_str()
+    
+    TM_beg = time.perf_counter()
+    
+    results = FDAPI.find_duplicates_from_dirs(IN_DIRS, MIN_SIZE_LIMIT, MAX_SIZE_LIMIT)
+    
+    TM_end_group = time.perf_counter()
+    
+    locations = results["filtered_locations"]
+    locations_len = len(locations)
+    hash_sizes = results["hash_sizes"]
+    IN_PATHS = results["IN_PATHS"]
+    fls_unfiltered = results["fls_unfiltered"]
+    
+    csv_rows: List[List[Any]] = []
+    
+    CSV_DELIMITER = ';'
+    CSV_QUOTECHAR = '"'
+    
+    csv_rows.append([f"csv delimiter = {CSV_DELIMITER}"])
+    csv_rows.append([f"csv quotechar = {CSV_QUOTECHAR}"])
+    
+    csv_rows.append( ["T:0", "==", "Empty row"] )
+    csv_rows.append( ["T:1", "==", "Group id", "File size", "File Path"] )
+    csv_rows.append( ["T:2", "==", "Input directory paths"] )
+    csv_rows.append( ["T:3", "==", "Info"] )
+    
+    
+    csv_rows.append( ["T:3", "======= filedups find_and_write_duplicates function begining ======= "] )
+    
+    csv_rows.append( ["T:3", "Start datetime ISO-8601 = {}".format(NOW_STR)] )
+
+    csv_rows.append(["T:2", IN_PATHS])
+    
+    csv_rows.append( ["T:3", "Total number of unfiltered files to search=", len(fls_unfiltered)] )
+    
+    csv_rows.append( ["T:3", "Using size filter. Min Size(bytes)=", MIN_SIZE_LIMIT] )
+    
+    csv_rows.append( ["T:3", "Using size filter. Max Size(bytes)=", MAX_SIZE_LIMIT] )
+    
+    csv_rows.append( ["T:3", "Total number of filtered files to search=", locations_len] )
+    
+    csv_rows.append( ["T:3", "Groupers = size, hashes (bytes)-{}".format(hash_sizes)] )
+    
+    found_groups = results["groups"]
+    FINDER = results["FINDER"]
+    
+    # Write groups to str buffer. Each line holds at least a group id and a path.
+    write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows)
+    
+    TM_end_str_write = time.perf_counter()
+
+    csv_rows.append( ["T:3", "End datetime ISO-8601 = {}".format(UT.get_now_str())] )
+    
+    csv_rows.append( ["T:3", "Elapsed Time for Grouping:",TM_end_group - TM_beg, "seconds."] )
+    
+    csv_rows.append( ["T:3", "Total Elapsed Time:",TM_end_str_write - TM_beg, "seconds."] )
+    
+    fpaths: List[str] = FINDER.get_file_paths()
+    
+    csv_rows.append( ["T:3", f"Total file count for grouping was: {len(fpaths)}"] )
+
+    csv_rows.append( ["T:3", "**********************************************************************"] )
+    
+    fname = f"filedups ({NOW_STR}) at least ({MIN_SIZE_LIMIT} bytes).csv"
+    
+    cio.csv_write_file(fname, csv_rows, delimiter = CSV_DELIMITER \
+						, quotechar = CSV_QUOTECHAR)
+    #
+    print(f"[ INFO ] Results were written to file: `{fname}`")
+#
 
 def main(args: dict):  #(
     NOW = UT.get_now_str()
@@ -86,7 +224,7 @@ def main(args: dict):  #(
     
     OUTFILE_PATH = "filedups ({}) (at least ({} KB)).txt".format(NOW, int(MIN_FSIZE/1024))
     
-    return filedups.find_and_write_duplicates(OUTFILE_PATH, search_paths, MIN_FSIZE, MAX_FSIZE)
+    return find_and_write_duplicates(OUTFILE_PATH, search_paths, MIN_FSIZE, MAX_FSIZE)
 #)
 
 

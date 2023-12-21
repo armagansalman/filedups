@@ -29,7 +29,7 @@ from typing import Callable
 # Callable[[ParamType1, ParamType2, .., ParamTypeN], ReturnType]
 
 from typing import Iterable as Iter
-Iter_t = Iter
+
 
 from typing import Sequence
 
@@ -48,8 +48,8 @@ from typing import TypeVar
 
 Str = str
 
-LocationIndices_t = Set[int]
-LocationGroups_t = Iter_t[LocationIndices_t]
+LocationIndices = Set[int]
+LocationGroups = Iter[LocationIndices]
 
 # Iterable_t = Iter_t
 

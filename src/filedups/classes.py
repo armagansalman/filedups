@@ -55,16 +55,16 @@ class DuplicateFinder:
     
     def apply_one_grouper(self, file_indices, \
                         FUNC) \
-                        -> LocationGroups_t:
+                        -> LocationGroups:
         #
-        locs: LocationGroups_t = FUNC(self, file_indices)
+        locs: LocationGroups = FUNC(self, file_indices)
         return locs
     #
     
     
     def rec_apply(self, file_indices, FUNC_IDX: int, \
                     GROUPERS: List[Callable]) \
-                    -> LocationGroups_t:
+                    -> LocationGroups:
         #
         locs: Set[int] = file_indices
         
@@ -74,7 +74,7 @@ class DuplicateFinder:
             return [locs]
         #
         
-        loc_groups: LocationGroups_t = self.apply_one_grouper(locs,\
+        loc_groups: LocationGroups = self.apply_one_grouper(locs,\
                                                     GROUPERS[FUNC_IDX])
         #
         
@@ -82,7 +82,7 @@ class DuplicateFinder:
         combined_groups = []
         
         for grp in loc_groups:
-            sub_grp_result: LocationGroups_t = self.rec_apply(grp, \
+            sub_grp_result: LocationGroups = self.rec_apply(grp, \
                                                 NEXT_FUNC_IDX, GROUPERS)
             #
             for sub_grp in sub_grp_result:
@@ -95,10 +95,10 @@ class DuplicateFinder:
     
     
     def apply_multiple_groupers(self, file_paths, \
-                    GROUPERS: List[Callable]) -> LocationGroups_t:
+                    GROUPERS: List[Callable]) -> LocationGroups:
         GROUPER_FUNC_IDX = 0
         
-        result_groups: LocationGroups_t = self.rec_apply(file_paths, \
+        result_groups: LocationGroups = self.rec_apply(file_paths, \
                                             GROUPER_FUNC_IDX, GROUPERS)
         #
         return result_groups
@@ -106,4 +106,4 @@ class DuplicateFinder:
     
 #
 
-GroupFunc_t = Callable[[DuplicateFinder, Locations], LocationGroups_t]
+GroupFunc = Callable[[DuplicateFinder, Locations], LocationGroups]

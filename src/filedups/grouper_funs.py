@@ -29,7 +29,7 @@ from common_types import *
 from classes import *
 
 
-def group_by_size(FINDER, INDICES: List[int]) -> LocationGroups_t:
+def group_by_size(FINDER, INDICES: List[int]) -> LocationGroups:
     
     size_groups: Dict[int, Set[int]] = dict()
     all_paths = FINDER.get_file_paths()
@@ -59,9 +59,9 @@ def group_by_size(FINDER, INDICES: List[int]) -> LocationGroups_t:
 #
 
 
-def sha512_first_X_bytes(X: int) -> GroupFunc_t:
+def sha512_first_X_bytes(X: int) -> GroupFunc:
     #
-    def grouper(FINDER, INDICES: List[int]) -> LocationGroups_t:
+    def grouper(FINDER, INDICES: List[int]) -> LocationGroups:
         #
         hash_groups: Dict[int, Set[int]] = dict()
         all_paths = FINDER.get_file_paths()
