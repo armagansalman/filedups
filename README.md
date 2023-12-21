@@ -2,7 +2,7 @@
 <br>Given a sequence of paths (full directory paths), finds and groups duplicate files recursively.
 <br>Doesn't provide 100% accuracy. Reported files in a group might not be exactly the same.
 
-## Example Scan on Wİndows
+## Example Scan on Windows
 [![How to use filedups on Windows](https://img.youtube.com/vi/vqp42JnJAAc/0.jpg)](https://www.youtube.com/watch?v=vqp42JnJAAc)
 
 ## HOW TO USE
