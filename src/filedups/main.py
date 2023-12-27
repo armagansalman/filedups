@@ -103,7 +103,7 @@ def write_typed_group_data(found_groups, FINDER, MIN_SIZE_LIMIT, csv_rows): #(
                 
                 csv_rows.append( ["T:1", f"{idx_grp}", f"{fsize_kb:1.2f} (KB)", f"{loc}"])
             #)
-		#)
+        #)
         except: #(
             logging.error(f"Couldn't get size of file: {loc}")
 
@@ -183,7 +183,7 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
     fname = f"filedups ({NOW_STR}) at least ({MIN_SIZE_LIMIT} bytes).csv"
     
     cio.csv_write_file(fname, csv_rows, delimiter = CSV_DELIMITER \
-						, quotechar = CSV_QUOTECHAR)
+                        , quotechar = CSV_QUOTECHAR)
     #
     print(f"[ INFO ] Results were written to file: `{fname}`")
 #

@@ -28,60 +28,60 @@ from typing import Iterable, Any
 
 
 def csv_read_file(
-				file_path: str \
-				, delimiter: str = ',' \
-				, quotechar: str = '"' \
-				, encoding='utf-8'):
-	#
-	with open(file_path, newline='', encoding=encoding) as csvfile:
-		csv_reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
-		
-		for row in csv_reader:
-			yield row
-		#
-	#
+                file_path: str \
+                , delimiter: str = ',' \
+                , quotechar: str = '"' \
+                , encoding='utf-8'):
+    #
+    with open(file_path, newline='', encoding=encoding) as csvfile:
+        csv_reader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+        
+        for row in csv_reader:
+            yield row
+        #
+    #
 #
 
 Iter = Iterable
 def csv_write_file(
-				file_path: str \
-				, rows: Iter[Iter[Any]] \
-				, file_mode: str = 'w' \
-				, delimiter:str = ",", quotechar:str = '"' \
-				, quoting = csv.QUOTE_MINIMAL \
-				, encoding='utf-8'):
-	#
-	with open(file_path, file_mode, newline='', encoding=encoding) as csvfile:
-		csv_writer = csv.writer(csvfile, delimiter=delimiter,
-								quotechar=quotechar, quoting=quoting)
-		#
-		for row in rows:
-			csv_writer.writerow(row)
-		#
-	#
+                file_path: str \
+                , rows: Iter[Iter[Any]] \
+                , file_mode: str = 'w' \
+                , delimiter:str = ",", quotechar:str = '"' \
+                , quoting = csv.QUOTE_MINIMAL \
+                , encoding='utf-8'):
+    #
+    with open(file_path, file_mode, newline='', encoding=encoding) as csvfile:
+        csv_writer = csv.writer(csvfile, delimiter=delimiter,
+                                quotechar=quotechar, quoting=quoting)
+        #
+        for row in rows:
+            csv_writer.writerow(row)
+        #
+    #
 #
 
-def main(*args, **kwargs):	
-	rows = [
-			['Spam'] * 5 + ['Baked Beans'] \
-			, ['Spam', 'Lovely Spam', 'Wonderful Spam']
-	]
-	
-	fpath = 'eggs.csv'
-	
-	csv_write(fpath, rows)
-	
-	csv_rows = list(csv_read(fpath))
-	
-	for row, c_row in zip(rows, csv_rows):
-		assert(row == c_row)
-	#
-	print("All assertions passed.")
+def main(*args, **kwargs):  
+    rows = [
+            ['Spam'] * 5 + ['Baked Beans'] \
+            , ['Spam', 'Lovely Spam', 'Wonderful Spam']
+    ]
+    
+    fpath = 'eggs.csv'
+    
+    csv_write(fpath, rows)
+    
+    csv_rows = list(csv_read(fpath))
+    
+    for row, c_row in zip(rows, csv_rows):
+        assert(row == c_row)
+    #
+    print("All assertions passed.")
 #
 
 
 if __name__ == "__main__":
-	main()
+    main()
 #
 
 
