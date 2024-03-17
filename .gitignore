@@ -1,3 +1,5 @@
+*.bin
+*.log
 *.csv
 *.txt
 *.bak
@@ -6,6 +8,9 @@
 *.spec
 
 #( Ignore these folders:
+*.build/
+*.dist/
+*.egg-info/
 __pycache__/
 local/
 output/

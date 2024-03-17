@@ -1,3 +1,3 @@
-C:\Users\armagan\Documents\DATA
-C:\Users\armagan\Desktop
-C:\Users\armagan\Downloads
+/home/rmg/Documents
+/home/rmg/Desktop
+/home/rmg/Desktop

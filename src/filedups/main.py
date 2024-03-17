@@ -186,6 +186,8 @@ def find_and_write_duplicates(out_fpath, IN_DIRS: List[str], MIN_SIZE_LIMIT, MAX
                         , quotechar = CSV_QUOTECHAR)
     #
     print(f"[ INFO ] Results were written to file: `{fname}`")
+    
+    return out_fpath
 #
 
 def main(args: dict):  #(
