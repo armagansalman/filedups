@@ -31,3 +31,5 @@ Go to src/filedups in terminal.
 It takes at least 3 minutes to filter 284000 files to 40300 files and then find duplicates.
 <br>It takes at least 19 minutes to filter 286000 files to 140000 files and then find duplicates.
     
+<br>
+Executables: https://mega.nz/folder/9MtnBS6Y#mX-uxPin8hcAnt5ENvXBOg
